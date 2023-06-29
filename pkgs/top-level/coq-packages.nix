@@ -55,10 +55,12 @@ let
       gappalib = callPackage ../development/coq-modules/gappalib {};
       goedel = callPackage ../development/coq-modules/goedel {};
       graph-theory = callPackage ../development/coq-modules/graph-theory {};
+      hahn = callPackage ../development/coq-modules/hahn {};
       heq = callPackage ../development/coq-modules/heq {};
       hierarchy-builder = callPackage ../development/coq-modules/hierarchy-builder {};
       HoTT = callPackage ../development/coq-modules/HoTT {};
       hydra-battles = callPackage ../development/coq-modules/hydra-battles {};
+      imm = callPackage ../development/coq-modules/imm {};
       interval = callPackage ../development/coq-modules/interval {};
       InfSeqExt = callPackage ../development/coq-modules/InfSeqExt {};
       iris = callPackage ../development/coq-modules/iris {};
@@ -69,6 +71,7 @@ let
       math-classes = callPackage ../development/coq-modules/math-classes { };
       mathcomp = callPackage ../development/coq-modules/mathcomp {};
       ssreflect          = self.mathcomp.ssreflect;
+      sflib              = callPackage ../development/coq-modules/sflib {};
       mathcomp-ssreflect = self.mathcomp.ssreflect;
       mathcomp-fingroup  = self.mathcomp.fingroup;
       mathcomp-algebra   = self.mathcomp.algebra;
@@ -98,6 +101,7 @@ let
       paco = callPackage ../development/coq-modules/paco {};
       paramcoq = callPackage ../development/coq-modules/paramcoq {};
       parsec = callPackage ../development/coq-modules/parsec {};
+      promising-lib = callPackage ../development/coq-modules/promising-lib {};
       pocklington = callPackage ../development/coq-modules/pocklington {};
       QuickChick = callPackage ../development/coq-modules/QuickChick {};
       reglang = callPackage ../development/coq-modules/reglang {};
