@@ -13,7 +13,8 @@ with lib; mkCoqDerivation {
   pname = "promising-lib";
   ## you can configure the domain, owner and repository, the default are:
   # repo = "promising-lib";
-  owner = "snu-sf";
+  # owner = "snu-sf";
+  owner = "weakmemory";
   # domain = "github.com";
 
   inherit version;
