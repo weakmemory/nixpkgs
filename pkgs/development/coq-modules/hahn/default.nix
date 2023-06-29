@@ -13,8 +13,8 @@ with lib; mkCoqDerivation {
   pname = "hahn";
   ## you can configure the domain, owner and repository, the default are:
   # repo = "hahn";
-  # owner = "anlun";
-  owner = "vafeiadis";
+  # owner = "vafeiadis";
+  owner = "anlun";
   # domain = "github.com";
 
   inherit version;
