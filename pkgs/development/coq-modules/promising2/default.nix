@@ -46,6 +46,7 @@ with lib; mkCoqDerivation {
   ## Does the package contain OCaml code?
   # mlPlugin = false;
 
+  buildFlags = ["build"]; 
   # installPhase = "make -f Makefile.coq install"; 
   extraInstallFlags = ["-f" "Makefile.coq"]; 
 
