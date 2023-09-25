@@ -12,9 +12,8 @@
 with lib; mkCoqDerivation {
   pname = "sflib";
   ## you can configure the domain, owner and repository, the default are:
-  # repo = "sflib";
-  owner = "snu-sf";
-  # domain = "github.com";
+  owner = "weakmemory";
+  domain = "github.com";
 
   inherit version;
 ## The `defaultVersion` attribute is important for nixpkgs but can be kept unchanged
