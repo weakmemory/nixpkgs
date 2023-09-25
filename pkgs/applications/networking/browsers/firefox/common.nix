@@ -187,7 +187,6 @@ let
       # These values are exposed through telemetry
       "app.distributor" = "nixos";
       "app.distributor.channel" = "nixpkgs";
-      "app.partner.nixos" = "nixos";
     };
   });
 
@@ -239,14 +238,12 @@ buildStdenv.mkDerivation {
       hash = "sha256-fLUYaJwhrC/wF24HkuWn2PHqz7LlAaIZ1HYjRDB2w9A=";
     })
   ]
-  ++ lib.optionals (lib.versionOlder version "109") [
+  ++ lib.optionals (lib.versionOlder version "102.13") [
     # cherry-pick bindgen change to fix build with clang 16
     (fetchpatch {
       url = "https://git.alpinelinux.org/aports/plain/community/firefox-esr/bindgen.patch?id=4c4b0c01c808657fffc5b796c56108c57301b28f";
       hash = "sha256-lTvgT358M4M2vedZ+A6xSKsBYhSN+McdmEeR9t75MLU=";
     })
-  ]
-  ++ lib.optionals (lib.versionOlder version "111") [
     # cherry-pick mp4parse change fixing build with Rust 1.70+
     # original change: https://github.com/mozilla/mp4parse-rust/commit/8b5b652d38e007e736bb442ccd5aa5ed699db100
     # vendored to update checksums
@@ -472,7 +469,7 @@ buildStdenv.mkDerivation {
   # icu73 changed how it follows symlinks which breaks in the firefox sandbox
   # https://bugzilla.mozilla.org/show_bug.cgi?id=1839287
   ++ [ (if (lib.versionAtLeast version "115") then icu else icu72) ]
-  ++ [ (if (lib.versionAtLeast version "103") then nss_latest else nss_esr) ]
+  ++ [ (if (lib.versionAtLeast version "116") then nss_latest else nss_esr/*3.90*/) ]
   ++ lib.optional  alsaSupport alsa-lib
   ++ lib.optional  jackSupport libjack2
   ++ lib.optional  pulseaudioSupport libpulseaudio # only headers are needed

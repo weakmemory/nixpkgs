@@ -2,16 +2,16 @@
 
 buildGoModule rec {
   pname = "spicetify-cli";
-  version = "2.20.1";
+  version = "2.23.2";
 
   src = fetchFromGitHub {
     owner = "spicetify";
     repo = "spicetify-cli";
     rev = "v${version}";
-    hash = "sha256-VcTvtB/q4+n4DlYG8/QQ014Yqn+pmXoRyZx4Ldwu7Lc=";
+    hash = "sha256-wL4aZt64NWlGabEjU885dv8WYz4MNPM4saDoraaRMjw=";
   };
 
-  vendorHash = "sha256-61j3HVDe6AbXpdmxhQQctv4C2hNBK/rWvZeC+KtISKY=";
+  vendorHash = "sha256-rMMTUT7HIgYvxGcqR02VmxOh1ihE6xuIboDsnuOo09g=";
 
   ldflags = [
     "-s -w"
@@ -38,5 +38,6 @@ buildGoModule rec {
     homepage = "https://github.com/spicetify/spicetify-cli/";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ jonringer mdarocha ];
+    mainProgram = "spicetify-cli";
   };
 }

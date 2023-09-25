@@ -7,7 +7,7 @@
 }:
 buildPythonPackage rec {
   pname = "tika-client";
-  version = "0.1.1";
+  version = "0.4.0";
   format = "pyproject";
 
   disabled = pythonOlder "3.8";
@@ -15,8 +15,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "stumpylog";
     repo = "tika-client";
-    rev = version;
-    hash = "sha256-QVNUOL0BWSxIkuKPWrKnWDupqn6bQ40G4Nd+ctb41Xw=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-yp9Wxc5RUZYhv2RxQwImZGqqoQmtZEkfEmj40ilxhQM=";
   };
 
   propagatedBuildInputs = [

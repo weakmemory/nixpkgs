@@ -23,7 +23,7 @@ let
   vivaldiName = if isSnapshot then "vivaldi-snapshot" else "vivaldi";
 in stdenv.mkDerivation rec {
   pname = "vivaldi";
-  version = "6.0.2979.22";
+  version = "6.2.3105.48";
 
   suffix = {
     aarch64-linux = "arm64";
@@ -33,8 +33,8 @@ in stdenv.mkDerivation rec {
   src = fetchurl {
     url = "https://downloads.vivaldi.com/${branch}/vivaldi-${branch}_${version}-1_${suffix}.deb";
     hash = {
-      aarch64-linux = "sha256-x7wBbd7BdurnWGFeHD5kYb5t0/zGEXQaUwbHnNA4iME=";
-      x86_64-linux = "sha256-uN2nBWlullxpOZP2PzVCwKcNmO9XmDS3WiFOcp0dOqg=";
+      aarch64-linux = "sha256-SIuHulBZ7r0gaIdkF3zM3mzLOyiUWCM7YM2teA7T9is=";
+      x86_64-linux = "sha256-LsyeX+nPlOtMCWv1Zu46OZ7yMm9feqyGR73saAwM1SU=";
     }.${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
   };
 

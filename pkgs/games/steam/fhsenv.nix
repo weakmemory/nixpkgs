@@ -5,7 +5,7 @@
 , extraProfile ? "" # string to append to profile
 , extraArgs ? "" # arguments to always pass to steam
 , extraEnv ? { } # Environment variables to pass to Steam
-, withGameSpecificLibraries ? true # exclude game specific libraries
+, withGameSpecificLibraries ? true # include game specific libraries
 }:
 
 let
@@ -60,6 +60,9 @@ let
 
 in buildFHSEnv rec {
   name = "steam";
+
+  # Steam still needs 32bit and various native games do too
+  multiArch = true;
 
   targetPkgs = pkgs: with pkgs; [
     steam
@@ -137,6 +140,7 @@ in buildFHSEnv rec {
 
     # SteamVR
     udev
+    dbus
 
     # Other things from runtime
     glib
@@ -189,6 +193,7 @@ in buildFHSEnv rec {
     libxcrypt # Alien Isolation, XCOM 2, Company of Heroes 2
     mono
     ncurses # Crusader Kings III
+    openssl
     xorg.xkeyboardconfig
     xorg.libpciaccess
     xorg.libXScrnSaver # Dead Cells
@@ -196,7 +201,6 @@ in buildFHSEnv rec {
 
     # screeps dependencies
     gtk3
-    dbus
     zlib
     atk
     cairo
@@ -211,6 +215,7 @@ in buildFHSEnv rec {
     alsa-lib
 
     # Loop Hero
+    # FIXME: Also requires openssl_1_1, which is EOL. Either find an alternative solution, or remove these dependencies (if not needed by other games)
     libidn2
     libpsl
     nghttp2.lib
@@ -295,7 +300,7 @@ in buildFHSEnv rec {
     name = "steam-run";
 
     targetPkgs = commonTargetPkgs;
-    inherit multiPkgs profile extraInstallCommands;
+    inherit multiArch multiPkgs profile extraInstallCommands;
     inherit unshareIpc unsharePid;
 
     runScript = writeShellScript "steam-run" ''

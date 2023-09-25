@@ -124,6 +124,8 @@ rustPlatform.buildRustPackage {
   # minifying the JavaScript; passing it allows us to side-step more Node
   # JS dependencies for installation.
   preBuild = lib.optionalString webUISupport ''
+    mkdir -p .emscriptencache
+    export EM_CACHE=$(pwd)/.emscriptencache
     bash ./script/build-wasm --debug
   '';
 
@@ -163,6 +165,6 @@ rustPlatform.buildRustPackage {
       * Dependency-free so that the runtime library (which is written in pure C) can be embedded in any application
     '';
     license = licenses.mit;
-    maintainers = with maintainers; [ Profpatsch oxalica ];
+    maintainers = with maintainers; [ oxalica Profpatsch ];
   };
 }

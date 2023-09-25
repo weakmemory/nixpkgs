@@ -1,24 +1,25 @@
 { lib
 , buildGoModule
 , fetchFromGitHub
+, fetchpatch
 , fetchurl
 , nixosTests
 }:
 
 buildGoModule rec {
   pname = "mattermost";
-  version = "7.10.2";
+  version = "7.10.5";
 
   src = fetchFromGitHub {
     owner = "mattermost";
-    repo = "mattermost-server";
+    repo = "mattermost";
     rev = "v${version}";
-    hash = "sha256-gccWFcG+Jc/77nN9hiV/2gUcY5w0IzOktykbGgafBD0=";
+    hash = "sha256-7R2ivfF0wC4Y5NMcBhcmbwwULuaTUTP7hq1idwYsLYs=";
   };
 
   webapp = fetchurl {
     url = "https://releases.mattermost.com/${version}/mattermost-${version}-linux-amd64.tar.gz";
-    hash = "sha256-T2lyg4BtArx813kk6edQ7AX3ZmA7cTsrJuWs7k6WYPU=";
+    hash = "sha256-WTcQPXx9KYNDdA+cX46HWV2Cnq8ojUrsg0zn4IegR94=";
   };
 
   vendorHash = "sha256-7YxbBmkKeb20a3BNllB3RtvjAJLZzoC2OBK4l1Ud1bw=";

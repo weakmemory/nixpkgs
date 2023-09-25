@@ -2,13 +2,13 @@
 
 buildPythonApplication rec {
   pname = "gallery-dl";
-  version = "1.25.6";
+  version = "1.25.8";
   format = "setuptools";
 
   src = fetchPypi {
     inherit version;
     pname = "gallery_dl";
-    sha256 = "sha256-CCTO/1t6lIK2nQKtqgWq0HAm760t5tOhg8v99zUkY/U=";
+    sha256 = "sha256-6q2F9zSGZp0iZoBvOUIuIEqNs97hbsbzE23XJyTZUDc=";
   };
 
   propagatedBuildInputs = [
@@ -38,6 +38,7 @@ buildPythonApplication rec {
     homepage = "https://github.com/mikf/gallery-dl";
     changelog = "https://github.com/mikf/gallery-dl/blob/v${version}/CHANGELOG.md";
     license = licenses.gpl2Only;
+    mainProgram = "gallery-dl";
     maintainers = with maintainers; [ dawidsowa marsam ];
   };
 }

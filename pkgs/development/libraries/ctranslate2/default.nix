@@ -10,6 +10,10 @@
 , withOneDNN ? false, oneDNN
 , withOpenblas ? true, openblas
 , withRuy ? true
+
+# passthru tests
+, libretranslate
+, wyoming-faster-whisper
 }:
 
 let
@@ -17,13 +21,13 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "ctranslate2";
-  version = "3.15.1";
+  version = "3.20.0";
 
   src = fetchFromGitHub {
     owner = "OpenNMT";
     repo = "CTranslate2";
     rev = "v${version}";
-    hash = "sha256-lh4j53+LQj09tq3qiHrL2YrACzWY1V/HX8Ixnq0TTyY=";
+    hash = "sha256-PdCjzLyc5O1rrTtPz8JD08unY7uMNS5fcD3ZLHJDeYg=";
     fetchSubmodules = true;
   };
 
@@ -56,6 +60,13 @@ stdenv.mkDerivation rec {
     darwin.apple_sdk.frameworks.CoreGraphics
     darwin.apple_sdk.frameworks.CoreVideo
   ];
+
+  passthru.tests = {
+    inherit
+      libretranslate
+      wyoming-faster-whisper
+    ;
+  };
 
   meta = with lib; {
     description = "Fast inference engine for Transformer models";

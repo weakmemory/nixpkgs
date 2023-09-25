@@ -7,11 +7,11 @@ buildGoModule rec {
   src = fetchFromGitHub {
     owner = "czerwonk";
     repo = "junos_exporter";
-    rev = "${version}";
+    rev = version;
     sha256 = "sha256-XYISwq6xcVKhXUK6j22pQ5eOfuKNH0uXOEK1MUzSq90=";
   };
 
-  vendorSha256 = "sha256-IV0FZb1rjOMLf+vkzz/ZxUBMFD8VRDS51Wdud/yz32E=";
+  vendorHash = "sha256-IV0FZb1rjOMLf+vkzz/ZxUBMFD8VRDS51Wdud/yz32E=";
 
   meta = with lib; {
     description = "Exporter for metrics from devices running JunOS";

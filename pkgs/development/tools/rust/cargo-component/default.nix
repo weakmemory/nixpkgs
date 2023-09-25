@@ -1,64 +1,38 @@
 { lib
 , rustPlatform
 , fetchFromGitHub
-, fetchpatch
-, curl
 , pkg-config
-, protobuf
-, libgit2
 , openssl
-, zlib
 , stdenv
 , darwin
 }:
 
 rustPlatform.buildRustPackage {
   pname = "cargo-component";
-  version = "unstable-2023-06-20";
+  version = "unstable-2023-09-20";
 
   src = fetchFromGitHub {
     owner = "bytecodealliance";
     repo = "cargo-component";
-    rev = "277728b729577540fdd5977a59a4e51c061c6fcb";
-    hash = "sha256-Uu+S4TRbtei78ZNkYNkwHiIot0L7fUODJgd5xDjw8rg=";
+    rev = "9bfbdeabee2e91894059c1f061f0c18931428823";
+    hash = "sha256-ZLhW2aIpibU4YX5f40BqQ0tKENY4row+FIl3d/hi3dY=";
   };
 
   cargoLock = {
     lockFile = ./Cargo.lock;
     outputHashes = {
-      "warg-api-0.1.0" = "sha256-GYmHrGCmEMYCi8S+hd0CuBxkwF4BM1B9pJ1TOGCqHuk=";
+      "warg-api-0.1.0" = "sha256-kzxvGZUMUOueR8t1tiCpGJlPxqEHQMb1m1jhPYoatbA=";
     };
   };
 
-  patches = [
-    # update dependencies to make it work when dependencies are vendored
-    # https://github.com/bytecodealliance/registry/pull/138
-    ./update-registry.patch
-
-    # fix build when it is not in a git repository
-    # https://github.com/bytecodealliance/cargo-component/pull/92
-    (fetchpatch {
-      name = "export-wasi-adapter-version-even-if-git-fails.patch";
-      url = "https://github.com/bytecodealliance/cargo-component/commit/9b2517fe2c4dbb1077a8785fd79c677ad1b7fc6b.patch";
-      hash = "sha256-nY8ltBb8H7zkE2JLhXJiBOMwTM8CVvkXTSHTUyMqamo=";
-    })
-  ];
-
   nativeBuildInputs = [
-    curl
     pkg-config
-    protobuf
   ];
 
   buildInputs = [
-    curl
-    libgit2
     openssl
-    zlib
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.frameworks.Security
-  ] ++ lib.optionals (stdenv.isDarwin && stdenv.isx86_64) [
-    darwin.apple_sdk.frameworks.CoreFoundation
   ];
 
   # requires the wasm32-wasi target

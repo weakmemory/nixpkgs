@@ -18,6 +18,7 @@ rec {
     elemAt
     filter
     fromJSON
+    genList
     head
     isInt
     isList
@@ -346,7 +347,7 @@ rec {
        => [ "�" "�" "�" "�" ]
   */
   stringToCharacters = s:
-    map (p: substring p 1 s) (lib.range 0 (stringLength s - 1));
+    genList (p: substring p 1 s) (stringLength s);
 
   /* Manipulate a string character by character and replace them by
      strings before concatenating the results.
@@ -628,10 +629,10 @@ rec {
             This behavior is deprecated and will throw an error in the future.''
     (let
       preLen = stringLength prefix;
-      sLen = stringLength str;
     in
       if substring 0 preLen str == prefix then
-        substring preLen (sLen - preLen) str
+        # -1 will take the string until the end
+        substring preLen (-1) str
       else
         str);
 
