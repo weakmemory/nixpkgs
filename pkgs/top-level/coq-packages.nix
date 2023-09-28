@@ -64,6 +64,7 @@ let
       goedel = callPackage ../development/coq-modules/goedel {};
       graph-theory = callPackage ../development/coq-modules/graph-theory {};
       hahn = callPackage ../development/coq-modules/hahn {};
+      hahnExt = callPackage ../development/coq-modules/hahnExt {};
       heq = callPackage ../development/coq-modules/heq {};
       hierarchy-builder = callPackage ../development/coq-modules/hierarchy-builder {};
       HoTT = callPackage ../development/coq-modules/HoTT {};
