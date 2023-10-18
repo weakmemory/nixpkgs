@@ -111,6 +111,7 @@ let
       paramcoq = callPackage ../development/coq-modules/paramcoq {};
       parsec = callPackage ../development/coq-modules/parsec {};
       promising-lib = callPackage ../development/coq-modules/promising-lib {};
+      promising-ir = callPackage ../development/coq-modules/promising-ir {};
       promising2 = callPackage ../development/coq-modules/promising2 {};
       promising2ToImm = callPackage ../development/coq-modules/promising2ToImm {};
       pocklington = callPackage ../development/coq-modules/pocklington {};
