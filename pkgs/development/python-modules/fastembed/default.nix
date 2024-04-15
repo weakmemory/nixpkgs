@@ -1,8 +1,11 @@
 { lib
 , buildPythonPackage
 , fetchFromGitHub
+, huggingface-hub
 , pythonOlder
+, pythonRelaxDepsHook
 , poetry-core
+, onnx
 , onnxruntime
 , requests
 , tokenizers
@@ -10,32 +13,41 @@
 , pytestCheckHook
 }:
 
-buildPythonPackage {
+buildPythonPackage rec {
   pname = "fastembed";
-  version = "unstable-2023-09-07";
-  format = "pyproject";
+  version = "0.2.2";
+  pyproject = true;
 
   disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "qdrant";
     repo = "fastembed";
-    rev = "9c5d32f271dfe9ae4730694727ff5df480983942";
-    hash = "sha256-d7Zb0IL0NOPEPsCHe/ZMNELnSCG4+y8JmGAXnCRUd50=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-ufgco5wPBG19GM99rZV7LKQqEzzCv24I8026SMz0CH4=";
   };
 
   nativeBuildInputs = [
     poetry-core
+    pythonRelaxDepsHook
   ];
 
   propagatedBuildInputs = [
+    huggingface-hub
+    onnx
     onnxruntime
     requests
     tokenizers
     tqdm
   ];
 
-  pythonImportsCheck = [ "fastembed" ];
+  pythonImportsCheck = [
+    "fastembed"
+  ];
+
+  pythonRelaxDeps = [
+    "huggingface-hub"
+  ];
 
   nativeCheckInputs = [
     pytestCheckHook

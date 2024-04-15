@@ -4,6 +4,7 @@
 , fetchFromGitHub
 , testers
 , difftastic
+, stdenv
 }:
 
 let
@@ -16,13 +17,13 @@ in
 
 rustPlatform.buildRustPackage rec {
   pname = "difftastic";
-  version = "0.51.1";
+  version = "0.56.1";
 
   src = fetchFromGitHub {
     owner = "wilfred";
     repo = pname;
     rev = version;
-    hash = "sha256-u03UL5QB0mdMTgRtxVe4pgLlCeLx1cG7czo7uBKQI84=";
+    hash = "sha256-XQzsLowHtgXIKfUWx1Sj1D0F8scb7fNp33Cwfh5XvJI=";
   };
 
   cargoLock = {
@@ -31,6 +32,11 @@ rustPlatform.buildRustPackage rec {
       "tree_magic_mini-3.0.2" = "sha256-iIX/DeDbquObDPOx/pctVFN4R8GSkD9bPNkNgOLdUJs=";
     };
   };
+
+  # skip flaky tests
+  checkFlags = [
+    "--skip=options::tests::test_detect_display_width"
+  ];
 
   postPatch = ''
     patch -d $cargoDepsCopy/libmimalloc-sys-0.1.24/c_src/mimalloc \

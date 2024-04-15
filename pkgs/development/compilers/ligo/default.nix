@@ -15,40 +15,20 @@
 
 ocamlPackages.buildDunePackage rec {
   pname = "ligo";
-  version = "0.72.0";
+  version = "1.4.0";
   src = fetchFromGitLab {
     owner = "ligolang";
     repo = "ligo";
     rev = version;
-    sha256 = "sha256-DQ3TxxLxi8/W1+uBX7NEBIsVXBKnJBa6YNRBFleNrEA=";
+    sha256 = "sha256-N2RkeKJ+lEyNJwpmF5sORmOkDhNmTYRYAgvyR7Pc5EI=";
     fetchSubmodules = true;
   };
-
-  postPatch = ''
-    substituteInPlace "vendors/tezos-ligo/src/lib_hacl/hacl.ml" \
-      --replace \
-        "Hacl.NaCl.Noalloc.Easy.secretbox ~pt:msg ~n:nonce ~key ~ct:cmsg" \
-        "Hacl.NaCl.Noalloc.Easy.secretbox ~pt:msg ~n:nonce ~key ~ct:cmsg ()" \
-      --replace \
-        "Hacl.NaCl.Noalloc.Easy.box_afternm ~pt:msg ~n:nonce ~ck:k ~ct:cmsg" \
-        "Hacl.NaCl.Noalloc.Easy.box_afternm ~pt:msg ~n:nonce ~ck:k ~ct:cmsg ()"
-
-    substituteInPlace "vendors/tezos-ligo/src/lib_crypto/crypto_box.ml" \
-      --replace \
-        "secretbox_open ~key ~nonce ~cmsg ~msg" \
-        "secretbox_open ~key ~nonce ~cmsg ~msg ()" \
-      --replace \
-        "Box.box_open ~k ~nonce ~cmsg ~msg" \
-        "Box.box_open ~k ~nonce ~cmsg ~msg ()"
-  '';
 
   # The build picks this up for ligo --version
   LIGO_VERSION = version;
 
   # This is a hack to work around the hack used in the dune files
   OPAM_SWITCH_PREFIX = "${tezos-rust-libs}";
-
-  duneVersion = "3";
 
   strictDeps = true;
 
@@ -73,6 +53,7 @@ ocamlPackages.buildDunePackage rec {
     ocamlgraph
     bisect_ppx
     decompress
+    fileutils
     ppx_deriving
     ppx_deriving_yojson
     ppx_yojson_conv
@@ -93,6 +74,8 @@ ocamlPackages.buildDunePackage rec {
     parse-argv
     hacl-star
     prometheus
+    lwt_ppx
+    msgpck
     # lsp
     linol
     linol-lwt
@@ -144,6 +127,7 @@ ocamlPackages.buildDunePackage rec {
     homepage = "https://ligolang.org/";
     downloadPage = "https://ligolang.org/docs/intro/installation";
     description = "A friendly Smart Contract Language for Tezos";
+    mainProgram = "ligo";
     license = licenses.mit;
     platforms = ocamlPackages.ocaml.meta.platforms;
     broken = stdenv.isLinux && stdenv.isAarch64;

@@ -10,16 +10,16 @@
 
 buildGoModule rec {
   pname = "netmaker";
-  version = "0.21.0";
+  version = "0.23.0";
 
   src = fetchFromGitHub {
     owner = "gravitl";
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-RL0tGhtndahTezQFz/twyLh36h2RXFy7EUnPiLAxP4U=";
+    hash = "sha256-M2DY+C0g8G+DjicMeT3Ojn4GzG7vaE1OHKSy7O6T1Kk=";
   };
 
-  vendorHash = "sha256-4Wxutkg9OdKs6B8z/P6JMgcE3cGS+6W4V7sKzVBwRJc=";
+  vendorHash = "sha256-SUu0OvHCmlssH9HbAaMbiG0gF/ezxgf1n0HBiB/2PTs=";
 
   inherit subPackages;
 
@@ -38,7 +38,8 @@ buildGoModule rec {
     description = "WireGuard automation from homelab to enterprise";
     homepage = "https://netmaker.io";
     changelog = "https://github.com/gravitl/netmaker/-/releases/v${version}";
-    license = licenses.sspl;
+    license = licenses.asl20;
     maintainers = with maintainers; [ urandom qjoly ];
+    mainProgram = "netmaker";
   };
 }

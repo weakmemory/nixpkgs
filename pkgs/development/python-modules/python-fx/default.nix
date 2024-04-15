@@ -30,7 +30,7 @@
 
 buildPythonPackage rec {
   pname = "python-fx";
-  version = "0.3.0";
+  version = "0.3.1";
   format = "setuptools";
 
   disabled = pythonOlder "3.8";
@@ -39,7 +39,7 @@ buildPythonPackage rec {
     owner = "cielong";
     repo = "pyfx";
     rev = "refs/tags/v${version}";
-    hash = "sha256-Bgg6UbAyog1I4F2NfULY+UlPf2HeyBJdxm4+5bmCLN0=";
+    hash = "sha256-BXKH3AlYMNbMREW5Qx72PrbuZdXlmVS+knWWu/y9PsA=";
   };
 
   postPatch = ''
@@ -92,6 +92,7 @@ buildPythonPackage rec {
 
   meta = with lib; {
     description = "Module to view JSON in a TUI";
+    mainProgram = "pyfx";
     homepage = "https://github.com/cielong/pyfx";
     changelog = "https://github.com/cielong/pyfx/releases/tag/v${version}";
     license = with licenses; [ mit ];

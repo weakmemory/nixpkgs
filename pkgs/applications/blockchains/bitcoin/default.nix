@@ -33,14 +33,14 @@ let
 in
 stdenv.mkDerivation rec {
   pname = if withGui then "bitcoin" else "bitcoind";
-  version = "25.0";
+  version = "26.1";
 
   src = fetchurl {
     urls = [
       "https://bitcoincore.org/bin/bitcoin-core-${version}/bitcoin-${version}.tar.gz"
     ];
     # hash retrieved from signed SHA256SUMS
-    sha256 = "5df67cf42ca3b9a0c38cdafec5bbb517da5b58d251f32c8d2a47511f9be1ebc2";
+    sha256 = "9164ee5d717b4a20cb09f0496544d9d32f365734814fe399f5cdb4552a9b35ee";
   };
 
   nativeBuildInputs =
@@ -55,9 +55,9 @@ stdenv.mkDerivation rec {
     ++ lib.optionals withGui [ qrencode qtbase qttools ];
 
   postInstall = ''
-    installShellCompletion --cmd bitcoin-cli --bash contrib/completions/bash/bitcoin-cli.bash-completion
-    installShellCompletion --cmd bitcoind --bash contrib/completions/bash/bitcoind.bash-completion
-    installShellCompletion --cmd bitcoin-tx --bash contrib/completions/bash/bitcoin-tx.bash-completion
+    installShellCompletion --bash contrib/completions/bash/bitcoin-cli.bash
+    installShellCompletion --bash contrib/completions/bash/bitcoind.bash
+    installShellCompletion --bash contrib/completions/bash/bitcoin-tx.bash
 
     installShellCompletion --fish contrib/completions/fish/bitcoin-cli.fish
     installShellCompletion --fish contrib/completions/fish/bitcoind.fish
@@ -70,6 +70,10 @@ stdenv.mkDerivation rec {
     install -Dm644 ${desktop} $out/share/applications/bitcoin-qt.desktop
     substituteInPlace $out/share/applications/bitcoin-qt.desktop --replace "Icon=bitcoin128" "Icon=bitcoin"
     install -Dm644 share/pixmaps/bitcoin256.png $out/share/pixmaps/bitcoin.png
+  '';
+
+  preConfigure = lib.optionalString stdenv.isDarwin ''
+    export MACOSX_DEPLOYMENT_TARGET=10.13
   '';
 
   configureFlags = [

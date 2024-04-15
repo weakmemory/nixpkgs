@@ -2,6 +2,7 @@
 , stdenv
 , fetchPypi
 , buildPythonPackage
+, fetchpatch
 , appdirs
 , cffi
 , decorator
@@ -26,12 +27,12 @@ let
     if stdenv.isDarwin then [ mesa_drivers.dev ] else [ ocl-icd ];
 in buildPythonPackage rec {
   pname = "pyopencl";
-  version = "2023.1.2";
+  version = "2024.1";
   format = "pyproject";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-6wDNV0BJ1ZK2edz4v+erSjbJSjn9Gssaa0XWwNe+mmg=";
+    hash = "sha256-7NVy7pQK2L2hY5w6e+tog0/JqYrX6z9uAarE99nUusE=";
   };
 
   nativeBuildInputs = [

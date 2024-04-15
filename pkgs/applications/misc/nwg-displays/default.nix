@@ -8,19 +8,19 @@
 , pango
 , python310Packages
 , wrapGAppsHook
-, hyprlandSupport ? false
+, hyprlandSupport ? true
 , wlr-randr
 }:
 
 python310Packages.buildPythonApplication rec {
   pname = "nwg-displays";
-  version = "0.3.7";
+  version = "0.3.16";
 
   src = fetchFromGitHub {
     owner = "nwg-piotr";
     repo = "nwg-displays";
-    rev = "v${version}";
-    hash = "sha256-Y405ZeOSpc1aPKEzFdvlgJgpGAi9HUR+Hvx63uYdp88=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-rnaBYDGEsc8oGw4yZ60NQFbNf+L0tmHYDYf+UDoDmSI=";
   };
 
   nativeBuildInputs = [
@@ -45,6 +45,11 @@ python310Packages.buildPythonApplication rec {
   ];
 
   dontWrapGApps = true;
+
+  postInstall = ''
+    install -Dm444 nwg-displays.svg -t $out/share/icons/hicolor/scalable/apps
+    install -Dm444 nwg-displays.desktop -t $out/share/applications
+  '';
 
   preFixup = ''
     makeWrapperArgs+=("''${gappsWrapperArgs[@]}");

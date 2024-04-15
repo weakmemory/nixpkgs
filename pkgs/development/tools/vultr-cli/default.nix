@@ -1,23 +1,23 @@
-{ lib, buildGoModule, fetchFromGitHub, installShellFiles }:
+{ lib, stdenv, buildGoModule, fetchFromGitHub, installShellFiles }:
 
 buildGoModule rec {
   pname = "vultr-cli";
-  version = "2.18.2";
+  version = "3.0.3";
 
   src = fetchFromGitHub {
     owner = "vultr";
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-RW8t5s28eUxHKEz+UHdeHlRMYprKlA9AdtiEy661des=";
+    hash = "sha256-6OVigI2eHE8qFC5nmH67NcKkDD0iFXl3ynYJyFcpmGw=";
   };
 
-  vendorHash = "sha256-61hdhkFyp4an9KtqDzB4Sd2+t40QEoLgq7MvUBxEQKs=";
+  vendorHash = "sha256-MDzYiLMYoR9qOTPVnlzTDbgVvg72HDP2DpM6NKUFNdg=";
 
   nativeBuildInputs = [ installShellFiles ];
 
   ldflags = [ "-s" "-w" ];
 
-  postInstall = ''
+  postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
     installShellCompletion --cmd vultr-cli \
       --bash <($out/bin/vultr-cli completion bash) \
       --fish <($out/bin/vultr-cli completion fish) \

@@ -11,6 +11,7 @@
 , pygments
 , pytestCheckHook
 , pythonOlder
+, pythonRelaxDepsHook
 , pytz
 , pyyaml
 , requests
@@ -18,20 +19,25 @@
 
 buildPythonPackage rec {
   pname = "json-schema-for-humans";
-  version = "0.45.2";
-  format = "pyproject";
+  version = "0.47";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "coveooss";
-    repo = pname;
+    repo = "json-schema-for-humans";
     rev = "refs/tags/v${version}";
-    hash = "sha256-DmUQ06UabLcB67PyfRC/gmSkEY/V8kuZ/T/ZW1D11vA=";
+    hash = "sha256-yioYsCp+q5YWdIWDlNZkpaLqo++n+dV5jyEeIhUDHr4=";
   };
+
+  pythonRelaxDeps = [
+    "dataclasses-json"
+  ];
 
   nativeBuildInputs = [
     poetry-core
+    pythonRelaxDepsHook
   ];
 
   propagatedBuildInputs = [
@@ -64,6 +70,7 @@ buildPythonPackage rec {
 
   meta = with lib; {
     description = "Quickly generate HTML documentation from a JSON schema";
+    mainProgram = "generate-schema-doc";
     homepage = "https://github.com/coveooss/json-schema-for-humans";
     changelog = "https://github.com/coveooss/json-schema-for-humans/releases/tag/v${version}";
     license = licenses.asl20;

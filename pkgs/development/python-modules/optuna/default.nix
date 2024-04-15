@@ -12,7 +12,7 @@
 , colorlog
 , distributed
 , fakeredis
-, fastai
+, google-cloud-storage
 , lightgbm
 , matplotlib
 , mlflow
@@ -43,8 +43,8 @@
 
 buildPythonPackage rec {
   pname = "optuna";
-  version = "3.3.0";
-  format = "pyproject";
+  version = "3.6.1";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
@@ -52,7 +52,7 @@ buildPythonPackage rec {
     owner = "optuna";
     repo = "optuna";
     rev = "refs/tags/v${version}";
-    hash = "sha256-uHv8uEJOQO1+AeNSxBtnCt6gDQHLT1RToF4hfolVVX0=";
+    hash = "sha256-+ZqMRIza4K5VWTUm7tC87S08SI+C8GKd2Uh3rGoHwd0=";
   };
 
   nativeBuildInputs = [
@@ -62,7 +62,6 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [
     alembic
-    cmaes
     colorlog
     numpy
     packaging
@@ -77,7 +76,6 @@ buildPythonPackage rec {
       catboost
       cma
       distributed
-      fastai
       lightgbm
       mlflow
       pandas
@@ -96,6 +94,8 @@ buildPythonPackage rec {
     optional = [
       boto3
       botorch
+      cmaes
+      google-cloud-storage
       matplotlib
       pandas
       plotly
@@ -124,6 +124,8 @@ buildPythonPackage rec {
   disabledTestPaths = [
     # require unpackaged kaleido and building it is a bit difficult
     "tests/visualization_tests"
+    # ImportError: cannot import name 'mock_s3' from 'moto'
+    "tests/artifacts_tests/test_boto3.py"
   ];
 
   pythonImportsCheck = [
@@ -133,8 +135,9 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "A hyperparameter optimization framework";
     homepage = "https://optuna.org/";
-    changelog = "https://github.com/optuna/optuna/releases/tag/${src.rev}";
+    changelog = "https://github.com/optuna/optuna/releases/tag/${version}";
     license = licenses.mit;
     maintainers = with maintainers; [ natsukium ];
+    mainProgram = "optuna";
   };
 }

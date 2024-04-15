@@ -1,4 +1,4 @@
-{ config, lib, pkgs, options }:
+{ config, lib, pkgs, options, ... }:
 
 with lib;
 
@@ -25,7 +25,7 @@ let
   checkConfig = file:
     pkgs.runCommand "checked-blackbox-exporter.conf" {
       preferLocalBuild = true;
-      buildInputs = [ pkgs.buildPackages.prometheus-blackbox-exporter ];
+      nativeBuildInputs = [ pkgs.buildPackages.prometheus-blackbox-exporter ];
     } ''
       ln -s ${coerceConfigFile file} $out
       blackbox_exporter --config.check --config.file $out
@@ -35,14 +35,14 @@ in {
   extraOpts = {
     configFile = mkOption {
       type = types.path;
-      description = lib.mdDoc ''
+      description = ''
         Path to configuration file.
       '';
     };
     enableConfigCheck = mkOption {
       type = types.bool;
       default = true;
-      description = lib.mdDoc ''
+      description = ''
         Whether to run a correctness check for the configuration file. This depends
         on the configuration file residing in the nix-store. Paths passed as string will
         be copied to the store.

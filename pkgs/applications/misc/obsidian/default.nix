@@ -12,25 +12,25 @@
 let
   inherit (stdenv.hostPlatform) system;
   pname = "obsidian";
-  version = "1.4.13";
+  version = "1.5.12";
   appname = "Obsidian";
   meta = with lib; {
     description = "A powerful knowledge base that works on top of a local folder of plain text Markdown files";
     homepage = "https://obsidian.md";
     downloadPage = "https://github.com/obsidianmd/obsidian-releases/releases";
     license = licenses.obsidian;
-    maintainers = with maintainers; [ atila conradmearns zaninime qbit kashw2 ];
+    maintainers = with maintainers; [ atila conradmearns zaninime qbit kashw2 w-lfchen ];
   };
 
   filename = if stdenv.isDarwin then "Obsidian-${version}-universal.dmg" else "obsidian-${version}.tar.gz";
   src = fetchurl {
     url = "https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/${filename}";
-    sha256 = if stdenv.isDarwin then "sha256-FMaEq99D8bCQF91drHrB5icXyQIdnWIwhAM9yuG97aA=" else "sha256-TWDmoXpBhBrrdbqS6dbFq4BxC2Bshap3gbnB4/ONrQE=";
+    hash = if stdenv.isDarwin then "sha256-MSJmF5WddxbC/S7w2nWjlDxt5HPUDCoRFwJ2MZMH9Ks=" else "sha256-UQLljP7eZELTuHwX+OylXY+Wy2YK1ZEJX1IQfIvBLe8=";
   };
 
   icon = fetchurl {
     url = "https://obsidian.md/images/obsidian-logo-gradient.svg";
-    sha256 = "100j8fcrc5q8zv525siapminffri83s2khs2hw4kdxwrdjwh36qi";
+    hash = "sha256-EZsBuWyZ9zYJh0LDKfRAMTtnY70q6iLK/ggXlplDEoA=";
   };
 
   desktopItem = makeDesktopItem {

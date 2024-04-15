@@ -9,13 +9,13 @@
 
 stdenv.mkDerivation rec {
   pname = "bpftrace";
-  version = "0.19.0";
+  version = "0.20.3";
 
   src = fetchFromGitHub {
     owner = "iovisor";
     repo  = "bpftrace";
     rev   = "v${version}";
-    hash  = "sha256-+aU27mxK4R0SHSsdGQzv02fK0L/m9uCIv7AkLyLSGQY=";
+    hash  = "sha256-B4BxoZSPSpDWLUgcYgQEmuhVr2mX04hrFCLu04vp1so=";
   };
 
 

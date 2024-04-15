@@ -1,46 +1,46 @@
 { lib
 , buildPythonPackage
+, pythonOlder
 , fetchFromGitHub
 , setuptools
 , setuptools-scm
-, pythonRelaxDepsHook
 , pyasn1
 , pyasn1-modules
 , cryptography
 , joblib
 , gitpython
+, sqlalchemy
+, pygount
 , pytestCheckHook
 }:
 
 buildPythonPackage rec {
   pname = "edk2-pytool-library";
-  version = "0.18.0";
-  format = "pyproject";
+  version = "0.21.5";
+  pyproject = true;
+
+  disabled = pythonOlder "3.10";
 
   src = fetchFromGitHub {
     owner = "tianocore";
     repo = "edk2-pytool-library";
-    rev = "v${version}";
-    hash = "sha256-O7K439nAIHHTWSoR8mZWEu9sXcrhYfZto3RTgHZcOuA=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-4Sb8Lu/nYUXgGt9gVv+j32cwW7TjXfH8z+fwzKaOeM8=";
   };
 
-  nativeBuildInputs = [
+  build-system = [
     setuptools
     setuptools-scm
-    pythonRelaxDepsHook
   ];
 
-  pythonRelaxDeps = [
-    "tinydb"
-    "joblib"
-  ];
-
-  propagatedBuildInputs = [
+  dependencies = [
     pyasn1
     pyasn1-modules
     cryptography
     joblib
     gitpython
+    sqlalchemy
+    pygount
   ];
 
   nativeCheckInputs = [
@@ -52,9 +52,9 @@ buildPythonPackage rec {
     "test_basic_parse"
   ];
 
-  env.SETUPTOOLS_SCM_PRETEND_VERSION = version;
-
-  pythonImportsCheck = [ "edk2toollib" ];
+  pythonImportsCheck = [
+    "edk2toollib"
+  ];
 
   meta = with lib; {
     description = "Python library package that supports UEFI development";
@@ -62,5 +62,6 @@ buildPythonPackage rec {
     changelog = "https://github.com/tianocore/edk2-pytool-library/releases/tag/v${version}";
     license = licenses.bsd2Patent;
     maintainers = with maintainers; [ nickcao ];
+    platforms = platforms.linux;
   };
 }

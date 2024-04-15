@@ -3,6 +3,7 @@
 , fetchFromGitHub
 , cython
 , joblib
+, matplotlib
 , numpy
 , pandas
 , scikit-learn
@@ -16,16 +17,16 @@
 
 buildPythonPackage rec {
   pname = "pmdarima";
-  version = "2.0.3";
+  version = "2.0.4";
   format = "setuptools";
 
-  disable = pythonOlder "3.7";
+  disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "alkaline-ml";
     repo = "pmdarima";
-    rev = "v${version}";
-    hash = "sha256-uX4iZZ2deYqVWnqVZT6J0Djf2pXo7ug4MsOsPkKjvSU=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-LHwPgQRB/vP3hBM8nqafoCrN3ZSRIMWLzqTqDOETOEc=";
   };
 
   nativeBuildInputs = [ cython ];
@@ -43,10 +44,18 @@ buildPythonPackage rec {
   # Make sure we're running the tests for the actually installed
   # package, so that cython's compiled files are available.
   preCheck = ''
-    cd $out/lib/${python.libPrefix}/site-packages
+    cd $out/${python.sitePackages}
   '';
 
-  nativeCheckInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [
+    matplotlib
+    pytestCheckHook
+  ];
+
+  pytestFlagsArray = [
+    "-W" "ignore::pytest.PytestRemovedIn8Warning"
+  ];
+
   disabledTests= [
     # touches internet
     "test_load_from_web"

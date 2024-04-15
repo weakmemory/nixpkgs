@@ -1,30 +1,32 @@
 { lib
 , stdenv
 , fetchFromGitHub
-, autoreconfHook
-, boost
-, autoconf
-, automake
+, cmake
 }:
 
 stdenv.mkDerivation rec {
   pname = "re-flex";
-  version = "3.3.8";
+  version = "4.2.0";
 
   src = fetchFromGitHub {
     owner = "Genivia";
     repo = "RE-flex";
     rev = "v${version}";
-    sha256 = "sha256-ujBdR4NDY9TwHwghtj2uMJoLtuYpzw5cUCMSbEsXlmY=";
+    hash = "sha256-+/Q3lcdV4tEArYmuQN5iL6r5TS0J/zoLQ85bNazpSf8=";
   };
 
-  nativeBuildInputs = [ boost autoconf automake ];
+  outputs = [ "out" "bin" "dev" ];
+
+  nativeBuildInputs = [
+    cmake
+  ];
 
   meta = with lib; {
-    homepage = "https://github.com/Genivia/RE-flex";
+    homepage = "https://www.genivia.com/doc/reflex/html";
     description = "The regex-centric, fast lexical analyzer generator for C++ with full Unicode support";
     license = licenses.bsd3;
-    platforms = platforms.unix;
+    platforms = platforms.all;
     maintainers = with lib.maintainers; [ prrlvr ];
+    mainProgram = "reflex";
   };
 }

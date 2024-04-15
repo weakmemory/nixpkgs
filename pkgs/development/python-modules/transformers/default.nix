@@ -15,9 +15,11 @@
 , safetensors
 , tqdm
 # optional dependencies
+, diffusers
 , scikit-learn
 , tensorflow
 , onnxconverter-common
+, opencv4
 , tf2onnx
 , torch
 , accelerate
@@ -51,16 +53,16 @@
 
 buildPythonPackage rec {
   pname = "transformers";
-  version = "4.33.2";
+  version = "4.39.3";
   format = "setuptools";
 
   disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "huggingface";
-    repo = pname;
+    repo = "transformers";
     rev = "refs/tags/v${version}";
-    hash = "sha256-i2ruOOkuEHHwzGT2Iqy+Pt1sBBUx43eiNkwf2Iqdcfc=";
+    hash = "sha256-MJZvPbj9ypr6YwFGkzwCp9fVuM3vEGpeXK+gEIFzwRA=";
   };
 
   propagatedBuildInputs = [
@@ -87,6 +89,15 @@ buildPythonPackage rec {
     vision = [ pillow ];
   in
     {
+    agents = [
+      diffusers
+      accelerate
+      datasets
+      torch
+      sentencepiece
+      opencv4
+      pillow
+    ];
     ja = [
       # fugashi
       # ipadic
@@ -174,6 +185,7 @@ buildPythonPackage rec {
   meta = with lib; {
     homepage = "https://github.com/huggingface/transformers";
     description = "Natural Language Processing for TensorFlow 2.0 and PyTorch";
+    mainProgram = "transformers-cli";
     changelog = "https://github.com/huggingface/transformers/releases/tag/v${version}";
     license = licenses.asl20;
     platforms = platforms.unix;

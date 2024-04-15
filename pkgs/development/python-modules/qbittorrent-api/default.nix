@@ -2,33 +2,31 @@
 , buildPythonPackage
 , fetchPypi
 , requests
-, six
 , urllib3
 , packaging
 , setuptools
-, wheel
+, setuptools-scm
 }:
 
 buildPythonPackage rec {
   pname = "qbittorrent-api";
-  version = "2023.9.53";
-  format = "pyproject";
+  version = "2024.3.60";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-/q0bL1WxIn6giOp9kLUCLZRpS/2d2Rdr61rRwZXQRP8=";
+    hash = "sha256-gnT19BKyPqzcRK1aKsC97NxktR4aqPd3LOlVo9/1gJY=";
   };
 
   propagatedBuildInputs = [
     requests
-    six
     urllib3
     packaging
   ];
 
   nativeBuildInputs = [
     setuptools
-    wheel
+    setuptools-scm
   ];
 
   # Tests require internet access

@@ -10,18 +10,15 @@ with lib;
     environment.enableAllTerminfo = mkOption {
       default = false;
       type = types.bool;
-      description = lib.mdDoc ''
+      description = ''
         Whether to install all terminfo outputs
       '';
     };
 
     security.sudo.keepTerminfo = mkOption {
-      default = config.security.sudo.package.pname != "sudo-rs";
-      defaultText = literalMD ''
-        `true` unless using `sudo-rs`
-      '';
+      default = true;
       type = types.bool;
-      description = lib.mdDoc ''
+      description = ''
         Whether to preserve the `TERMINFO` and `TERMINFO_DIRS`
         environment variables, for `root` and the `wheel` group.
       '';

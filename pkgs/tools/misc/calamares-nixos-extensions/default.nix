@@ -2,13 +2,13 @@
 
 stdenv.mkDerivation rec {
   pname = "calamares-nixos-extensions";
-  version = "0.3.13";
+  version = "0.3.15";
 
   src = fetchFromGitHub {
     owner = "NixOS";
     repo = "calamares-nixos-extensions";
     rev = version;
-    sha256 = "YCtm7OzPdhtV7/fQijJfZvZyX7oEk92F34CK2lnRHnI=";
+    hash = "sha256-PZQjrteLWcInXIavuANHfzfl9gOXATWtIlDUp45j5Ao=";
   };
 
   installPhase = ''

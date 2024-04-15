@@ -13,8 +13,8 @@ let
     aspnetcore_6_0
   ];
 
-  version = "2.9.0";
-  hash = "sha256-8lEHo2ZEx4kkT/tLgbSmjFx9qHyAQIaha75ISIHj3hA=";
+  version = "2.11.1";
+  hash = "sha256-GY6YRgebWeJtjAIm64Pf8wx6pUdZjbevNzKRdyPi1ow=";
 
 in
 stdenv.mkDerivation {

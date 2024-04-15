@@ -1,6 +1,8 @@
 { lib
 , stdenv
+, bash
 , fetchFromGitHub
+, fetchFromGitLab
 , SDL2
 , alsa-lib
 , catch2_3
@@ -39,7 +41,6 @@
 , upower
 , wayland
 , wireplumber
-, wlroots
 , wrapGAppsHook
 
 , cavaSupport ? true
@@ -51,6 +52,7 @@
 , mpdSupport ? true
 , mprisSupport ? stdenv.isLinux
 , nlSupport ? true
+, pipewireSupport ? true
 , pulseSupport ? true
 , rfkillSupport ? true
 , runTests ? true
@@ -61,6 +63,7 @@
 , upowerSupport ? true
 , wireplumberSupport ? true
 , withMediaPlayer ? mprisSupport && false
+, nix-update-script
 }:
 
 let
@@ -68,24 +71,35 @@ let
   libcava.src = fetchFromGitHub {
     owner = "LukashonakV";
     repo = "cava";
-    rev = "0.8.5";
-    hash = "sha256-b/XfqLh8PnW018sGVKRRlFvBpo2Ru1R2lUeTR7pugBo=";
+    rev = "0.10.1";
+    hash = "sha256-iIYKvpOWafPJB5XhDOSIW9Mb4I3A4pcgIIPQdQYEqUw=";
   };
+
+  wireplumber_0_4 = wireplumber.overrideAttrs (attrs: rec {
+    version = "0.4.17";
+    src = fetchFromGitLab {
+      domain = "gitlab.freedesktop.org";
+      owner = "pipewire";
+      repo = "wireplumber";
+      rev = version;
+      hash = "sha256-vhpQT67+849WV1SFthQdUeFnYe/okudTQJoL3y+wXwI=";
+    };
+  });
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "waybar";
-  version = "0.9.22";
+  version = "0.10.0";
 
   src = fetchFromGitHub {
     owner = "Alexays";
     repo = "Waybar";
     rev = finalAttrs.version;
-    hash = "sha256-9LJDA+zrHF9Mn8+W9iUw50LvO+xdT7/l80KdltPrnDo=";
+    hash = "sha256-p1VRrKT2kTDy48gDXPMHlLbfcokAOFeTZXGzTeO1SAE=";
   };
 
   postUnpack = lib.optional cavaSupport ''
     pushd "$sourceRoot"
-    cp -R --no-preserve=mode,ownership ${libcava.src} subprojects/cava-0.8.5
+    cp -R --no-preserve=mode,ownership ${libcava.src} subprojects/cava-0.10.1
     patchShebangs .
     popd
   '';
@@ -115,7 +129,6 @@ stdenv.mkDerivation (finalAttrs: {
     libxkbcommon
     spdlog
     wayland
-    wlroots
   ]
   ++ lib.optionals cavaSupport [
     SDL2
@@ -123,7 +136,6 @@ stdenv.mkDerivation (finalAttrs: {
     fftw
     iniparser
     ncurses
-    pipewire
     portaudio
   ]
   ++ lib.optional evdevSupport libevdev
@@ -139,7 +151,8 @@ stdenv.mkDerivation (finalAttrs: {
   ++ lib.optional traySupport libdbusmenu-gtk3
   ++ lib.optional udevSupport udev
   ++ lib.optional upowerSupport upower
-  ++ lib.optional wireplumberSupport wireplumber
+  ++ lib.optional wireplumberSupport wireplumber_0_4
+  ++ lib.optional (cavaSupport || pipewireSupport) pipewire
   ++ lib.optional (!stdenv.isLinux) libinotify-kqueue;
 
   nativeCheckInputs = [ catch2_3 ];
@@ -148,7 +161,6 @@ stdenv.mkDerivation (finalAttrs: {
   mesonFlags = (lib.mapAttrsToList lib.mesonEnable {
     "cava" = cavaSupport;
     "dbusmenu-gtk" = traySupport;
-    "gtk-layer-shell" = true;
     "jack" = jackSupport;
     "libinput" = inputSupport;
     "libnl" = nlSupport;
@@ -156,6 +168,7 @@ stdenv.mkDerivation (finalAttrs: {
     "man-pages" = true;
     "mpd" = mpdSupport;
     "mpris" = mprisSupport;
+    "pipewire" = pipewireSupport;
     "pulseaudio" = pulseSupport;
     "rfkill" = rfkillSupport;
     "sndio" = sndioSupport;
@@ -165,12 +178,19 @@ stdenv.mkDerivation (finalAttrs: {
     "wireplumber" = wireplumberSupport;
   }) ++ lib.optional experimentalPatches (lib.mesonBool "experimental" true);
 
+  postPatch = ''
+    substituteInPlace include/util/command.hpp \
+      --replace-fail /bin/sh ${lib.getExe' bash "sh"}
+  '';
+
   preFixup = lib.optionalString withMediaPlayer ''
     cp $src/resources/custom_modules/mediaplayer.py $out/bin/waybar-mediaplayer.py
 
     wrapProgram $out/bin/waybar-mediaplayer.py \
       --prefix PYTHONPATH : "$PYTHONPATH:$out/${python3.sitePackages}"
   '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     homepage = "https://github.com/alexays/waybar";
@@ -180,13 +200,12 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "waybar";
     maintainers = with lib.maintainers; [
       FlorianFranzen
-      jtbx
       lovesegfault
       minijackson
       rodrgz
       synthetica
       khaneliman
     ];
-    inherit (wlroots.meta) platforms;
+    platforms = lib.platforms.linux;
   };
 })

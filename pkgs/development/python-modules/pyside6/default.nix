@@ -5,7 +5,6 @@
 , python
 , moveBuildTree
 , shiboken6
-, libxcrypt
 }:
 
 stdenv.mkDerivation rec {
@@ -20,7 +19,7 @@ stdenv.mkDerivation rec {
   postPatch = lib.optionalString stdenv.isLinux ''
     # Don't ignore optional Qt modules
     substituteInPlace cmake/PySideHelpers.cmake \
-      --replace \
+      --replace-fail \
         'string(FIND "''${_module_dir}" "''${_core_abs_dir}" found_basepath)' \
         'set (found_basepath 0)'
   '';
@@ -73,7 +72,7 @@ stdenv.mkDerivation rec {
 
   postInstall = ''
     cd ../../..
-    ${python.pythonForBuild.interpreter} setup.py egg_info --build-type=pyside6
+    ${python.pythonOnBuildForHost.interpreter} setup.py egg_info --build-type=pyside6
     cp -r PySide6.egg-info $out/${python.sitePackages}/
   '';
 

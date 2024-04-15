@@ -24,7 +24,6 @@
 , qcoro
 , qqc2-desktop-style
 , qtgraphicaleffects
-, qtkeychain
 , qtlocation
 , qtmultimedia
 , qtquickcontrols2
@@ -59,7 +58,6 @@ mkDerivation {
     olm
     qcoro
     qtgraphicaleffects
-    qtkeychain
     qtlocation
     qtmultimedia
     qtquickcontrols2
@@ -69,6 +67,7 @@ mkDerivation {
 
   meta = with lib; {
     description = "A client for matrix, the decentralized communication protocol";
+    mainProgram = "neochat";
     homepage = "https://apps.kde.org/en/neochat";
     license = licenses.gpl3Only;
     maintainers = with maintainers; [ peterhoeg ];

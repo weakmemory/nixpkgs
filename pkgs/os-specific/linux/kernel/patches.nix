@@ -44,8 +44,6 @@
       patch = ./modinst-arg-list-too-long.patch;
     };
 
-  cpu-cgroup-v2 = import ./cpu-cgroup-v2-patches;
-
   hardened = let
     mkPatch = kernelVersion: { version, sha256, patch }: let src = patch; in {
       name = lib.removeSuffix ".patch" src.name;
@@ -66,5 +64,19 @@
   export-rt-sched-migrate = {
     name = "export-rt-sched-migrate";
     patch = ./export-rt-sched-migrate.patch;
+  };
+
+  rust_1_75 = {
+    name = "rust-1.75.patch";
+    patch = ./rust-1.75.patch;
+  };
+
+  rust_1_76 = {
+    name = "rust-1.76.patch";
+    patch = fetchurl {
+      name = "rust-1.76.patch";
+      url = "https://lore.kernel.org/rust-for-linux/20240217002638.57373-2-ojeda@kernel.org/raw";
+      hash = "sha256-q3iNBo8t4b1Rn5k5lau2myqOAqdA/9V9A+ok2jGkLdY=";
+    };
   };
 }

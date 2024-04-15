@@ -7,6 +7,7 @@
 , openssl
 , installShellFiles
 , dbus
+, sudo
 , Libsystem
 , Cocoa
 , Kernel
@@ -17,37 +18,39 @@
 , libpng
 , python3
 , zlib
+, simde
 , bashInteractive
 , zsh
 , fish
 , nixosTests
-, go
-, buildGoModule
+, go_1_22
+, buildGo122Module
 , nix-update-script
 }:
 
 with python3Packages;
 buildPythonApplication rec {
   pname = "kitty";
-  version = "0.30.0";
+  version = "0.34.0";
   format = "other";
 
   src = fetchFromGitHub {
     owner = "kovidgoyal";
     repo = "kitty";
     rev = "refs/tags/v${version}";
-    hash = "sha256-M6qFkeUp2rBudO2PiLN2VSrmut68c9mjjUr07WEX9VY=";
+    hash = "sha256-IP1CWMHiWnBSbt+78EQ6hfX2A9FDhlwt0KLthXtO4dA=";
   };
 
-  goModules = (buildGoModule {
+  goModules = (buildGo122Module {
     pname = "kitty-go-modules";
     inherit src version;
-    vendorHash = "sha256-53Y2S/P2fWT9STZFTdlkESxHNpoAggifZJ0+WXCzbkU=";
+    vendorHash = "sha256-HNE0MWjL0PH20Glzb0GV6+lQu/Lslx8k/+YvlLHbHww=";
   }).goModules;
 
   buildInputs = [
     harfbuzz
     ncurses
+    simde
     lcms2
     librsync
     openssl.dev
@@ -77,7 +80,7 @@ buildPythonApplication rec {
     sphinx-copybutton
     sphinxext-opengraph
     sphinx-inline-tabs
-    go
+    go_1_22
   ] ++ lib.optionals stdenv.isDarwin [
     imagemagick
     libicns  # For the png2icns tool.
@@ -128,17 +131,17 @@ buildPythonApplication rec {
     runHook preBuild
     ${ lib.optionalString (stdenv.isDarwin && stdenv.isx86_64) "export MACOSX_DEPLOYMENT_TARGET=11" }
     ${if stdenv.isDarwin then ''
-      ${python.pythonForBuild.interpreter} setup.py build ${darwinOptions}
+      ${python.pythonOnBuildForHost.interpreter} setup.py build ${darwinOptions}
       make docs
-      ${python.pythonForBuild.interpreter} setup.py kitty.app ${darwinOptions}
+      ${python.pythonOnBuildForHost.interpreter} setup.py kitty.app ${darwinOptions}
     '' else ''
-      ${python.pythonForBuild.interpreter} setup.py linux-package \
+      ${python.pythonOnBuildForHost.interpreter} setup.py linux-package \
       --egl-library='${lib.getLib libGL}/lib/libEGL.so.1' \
       --startup-notification-library='${libstartup_notification}/lib/libstartup-notification-1.so' \
       --canberra-library='${libcanberra}/lib/libcanberra.so' \
       --fontconfig-library='${fontconfig.lib}/lib/libfontconfig.so' \
       ${commonOptions}
-      ${python.pythonForBuild.interpreter} setup.py build-launcher
+      ${python.pythonOnBuildForHost.interpreter} setup.py build-launcher
     ''}
     runHook postBuild
   '';
@@ -150,6 +153,9 @@ buildPythonApplication rec {
     bashInteractive
     zsh
     fish
+  ] ++ lib.optionals (!stdenv.isDarwin) [
+    # integration tests need sudo
+    sudo
   ];
 
   # skip failing tests due to darwin sandbox
@@ -228,7 +234,9 @@ buildPythonApplication rec {
   '';
 
   passthru = {
-    tests.test = nixosTests.terminal-emulators.kitty;
+    tests = lib.optionalAttrs stdenv.isLinux {
+      default = nixosTests.terminal-emulators.kitty;
+    };
     updateScript = nix-update-script {};
   };
 
@@ -236,7 +244,10 @@ buildPythonApplication rec {
     homepage = "https://github.com/kovidgoyal/kitty";
     description = "A modern, hackable, featureful, OpenGL based terminal emulator";
     license = licenses.gpl3Only;
-    changelog = "https://sw.kovidgoyal.net/kitty/changelog/";
+    changelog = [
+      "https://sw.kovidgoyal.net/kitty/changelog/"
+      "https://github.com/kovidgoyal/kitty/blob/v${version}/docs/changelog.rst"
+    ];
     platforms = platforms.darwin ++ platforms.linux;
     mainProgram = "kitty";
     maintainers = with maintainers; [ tex rvolosatovs Luflosi adamcstephens kashw2 ];

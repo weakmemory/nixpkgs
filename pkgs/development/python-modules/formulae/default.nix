@@ -3,6 +3,7 @@
 , pythonOlder
 , fetchFromGitHub
 , setuptools
+, setuptools-scm
 , pytestCheckHook
 , numpy
 , pandas
@@ -11,7 +12,7 @@
 
 buildPythonPackage rec {
   pname = "formulae";
-  version = "0.5.0";
+  version = "0.5.3";
   format = "pyproject";
 
   disabled = pythonOlder "3.7";
@@ -20,10 +21,13 @@ buildPythonPackage rec {
     owner = "bambinos";
     repo = pname;
     rev = "refs/tags/${version}";
-    hash = "sha256-WDWpyrHXGBfheE0m5I9K+Dk1urXRMY6yoenN3OaZogM=";
+    hash = "sha256-A0CI0bpoRYFAcPiNAf5haQu9BEqmBgxF7HfIl4qcML0=";
   };
 
-  nativeBuildInputs = [ setuptools ];
+  nativeBuildInputs = [
+    setuptools
+    setuptools-scm
+  ];
 
   propagatedBuildInputs = [
     numpy

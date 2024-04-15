@@ -3,19 +3,20 @@
 , boost
 , cmake
 , fetchFromGitHub
+, fetchpatch
 , eigen
 , zlib
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "libcifpp";
-  version = "5.1.2";
+  version = "7.0.3";
 
   src = fetchFromGitHub {
     owner = "PDB-REDO";
     repo = "libcifpp";
     rev = "refs/tags/v${finalAttrs.version}";
-    hash = "sha256-wx5D0kNKetgc/8LFAgNxTAwni+lJb2rajsxh0AASpeY=";
+    hash = "sha256-YRK648gJ2UlgeG5GHMjTid1At0lYt7Zqu4/+O5WG/OM=";
   };
 
   nativeBuildInputs = [

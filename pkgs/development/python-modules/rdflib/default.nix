@@ -4,6 +4,9 @@
 , fetchFromGitHub
 , pythonOlder
 
+# builds
+, poetry-core
+
 # propagates
 , isodate
 , pyparsing
@@ -21,21 +24,27 @@
 , pip
 , pytest-cov
 , pytestCheckHook
+, pytest_7
+, setuptools
 }:
 
 buildPythonPackage rec {
   pname = "rdflib";
-  version = "6.2.0";
-  format = "setuptools";
+  version = "7.0.0";
+  format = "pyproject";
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "RDFLib";
     repo = pname;
     rev = "refs/tags/${version}";
-    hash = "sha256-GkqfSyApOFKPIiIYXhgaRZuMawk7PRYmxGDhnRI+Rz0=";
+    hash = "sha256-VCjvgXMun1Hs+gPeqjzLXbIX1NBQ5aMLz0aWlwsm0iY=";
   };
+
+  nativeBuildInputs = [
+    poetry-core
+  ];
 
   propagatedBuildInputs = [
     isodate
@@ -59,7 +68,9 @@ buildPythonPackage rec {
   nativeCheckInputs = [
     pip
     pytest-cov
-    pytestCheckHook
+    # Failed: DID NOT WARN. No warnings of type (<class 'UserWarning'>,) were emitted.
+    (pytestCheckHook.override { pytest = pytest_7; })
+    setuptools
   ]
   ++ passthru.optional-dependencies.networkx
   ++ passthru.optional-dependencies.html;
@@ -76,6 +87,7 @@ buildPythonPackage rec {
     "testGuessFormatForParse"
     "test_infix_owl_example1"
     "test_context"
+    "test_example"
     "test_guess_format_for_parse"
     "rdflib.extras.infixowl"
   ] ++ lib.optionals stdenv.isDarwin [

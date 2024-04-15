@@ -1,9 +1,9 @@
 { lib
-, buildGo121Module
+, buildGo122Module
 , fetchFromGitHub
 , fetchNpmDeps
 , cacert
-, go
+, go_1_22
 , git
 , enumer
 , mockgen
@@ -14,22 +14,27 @@
 , stdenv
 }:
 
-buildGo121Module rec {
+let
+  buildGoModule = buildGo122Module;
+  go = go_1_22;
+in
+
+buildGoModule rec {
   pname = "evcc";
-  version = "0.120.1";
+  version = "0.124.10";
 
   src = fetchFromGitHub {
     owner = "evcc-io";
-    repo = pname;
+    repo = "evcc";
     rev = version;
-    hash = "sha256-mifpswB8hA7Ke2r2afYRlGDdhbz7AYxMZBNaRQvUodQ=";
+    hash = "sha256-NbM8Uev2qIIS6WriP7QnVUumF29rZSOCavouPkPmYpE=";
   };
 
-  vendorHash = "sha256-LNMNqlb/aj+ZHuwMvtK//oWyi34mm47ShAAD427szS4=";
+  vendorHash = "sha256-PZWMqv3R4Dq4cLtGNuvHCQ/GiYvlKJfSKEmBn0JYnb8=";
 
   npmDeps = fetchNpmDeps {
     inherit src;
-    hash = "sha256-quznAvgAFJJnKabsFZxAu7yDkAuvujg6of6En8JaFs4=";
+    hash = "sha256-FWnRZ/NI49QZj8Uv6IbHc8IPAh3F5u4S6hY64B8+Uvk=";
   };
 
   nativeBuildInputs = [
@@ -85,7 +90,7 @@ buildGo121Module rec {
   meta = with lib; {
     description = "EV Charge Controller";
     homepage = "https://evcc.io";
-    changelog = "https://github.com/andig/evcc/releases/tag/${version}";
+    changelog = "https://github.com/evcc-io/evcc/releases/tag/${version}";
     license = licenses.mit;
     maintainers = with maintainers; [ hexa ];
   };

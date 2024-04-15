@@ -2,16 +2,16 @@
 
 buildGoModule rec {
   pname = "kopia";
-  version = "0.14.1";
+  version = "0.16.1";
 
   src = fetchFromGitHub {
     owner = pname;
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-ELnop8/f7/4E5FnWwGrPJt3n9YhSG1jei1tAt3zr1KI=";
+    hash = "sha256-q22iK467dCW9y0ephVA+V9L9drO2631l4cLlphhdwnQ=";
   };
 
-  vendorHash = "sha256-8NTAnkIJkFKyjQL7KBoCqtSBog9Hz1vPBo81u8YcA1A=";
+  vendorHash = "sha256-5lm3N9F1Pe/lSA63qk8/azo5FZzTvJE/Is2N9WKT+7k=";
 
   doCheck = false;
 
@@ -25,6 +25,7 @@ buildGoModule rec {
   meta = with lib; {
     homepage = "https://kopia.io";
     description = "Cross-platform backup tool with fast, incremental backups, client-side end-to-end encryption, compression and data deduplication";
+    mainProgram = "kopia";
     license = licenses.asl20;
     maintainers = [ maintainers.bbigras ];
   };

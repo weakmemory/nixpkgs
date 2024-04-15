@@ -2,9 +2,9 @@
 , buildPythonPackage
 , fetchPypi
 , pythonOlder
-, substituteAll
 , hatchling
 , ipykernel
+, exceptiongroup
 , ipython
 , jupyter-client
 , jupyter-core
@@ -51,6 +51,8 @@ buildPythonPackage rec {
     pygments
     pyzmq
     traitlets
+  ] ++ lib.optionals (pythonOlder "3.11") [
+    exceptiongroup
   ];
 
   pythonImportsCheck = [
@@ -69,6 +71,7 @@ buildPythonPackage rec {
 
   meta = {
     description = "Jupyter terminal console";
+    mainProgram = "jupyter-console";
     homepage = "https://github.com/jupyter/jupyter_console";
     changelog = "https://github.com/jupyter/jupyter_console/releases/tag/v${version}";
     license = lib.licenses.bsd3;

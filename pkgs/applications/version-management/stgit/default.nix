@@ -18,15 +18,15 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "stgit";
-  version = "2.3.2";
+  version = "2.4.6";
 
   src = fetchFromGitHub {
     owner = "stacked-git";
     repo = "stgit";
     rev = "v${version}";
-    hash = "sha256-rQNX54zmVHZKplEUNaKyVtCrC8Q4DdxLzNSStiYvDGA=";
+    hash = "sha256-ZQU9AkemAMpMb2GhdfHaF6r6r6MbMXnmA0pq6Zq9Sek=";
   };
-  cargoHash = "sha256-ju8JQnohidBsydwwm6gNx1L24brmDWYXwNgfCl7G/aA=";
+  cargoHash = "sha256-DHTo0jRZlLmw/B042uqzpMLUhBwm+sbFj9pze5l1Kpk=";
 
   nativeBuildInputs = [
     pkg-config installShellFiles makeWrapper asciidoc xmlto docbook_xsl
@@ -84,5 +84,6 @@ rustPlatform.buildRustPackage rec {
     license = licenses.gpl2Only;
     platforms = platforms.unix;
     maintainers = with maintainers; [ jshholland ];
+    mainProgram = "stg";
   };
 }

@@ -16,14 +16,14 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "nixpkgs-review";
-  version = "2.10.2";
+  version = "2.10.4";
   format = "pyproject";
 
   src = fetchFromGitHub {
     owner = "Mic92";
     repo = "nixpkgs-review";
     rev = version;
-    hash = "sha256-x41piT7peYV3sNMVYsqcjCU4u+PayZb05JIWBeWF7jw=";
+    hash = "sha256-+4T6Mm4YfH0wWlkNYS03H9Z9oNlYQnVUncvWGA0CKIQ=";
   };
 
   nativeBuildInputs = [
@@ -53,9 +53,9 @@ python3.pkgs.buildPythonApplication rec {
   postInstall = lib.optionalString withAutocomplete ''
     for cmd in nix-review nixpkgs-review; do
       installShellCompletion --cmd $cmd \
-        --bash <(register-python-argcomplete $out/bin/$cmd) \
-        --fish <(register-python-argcomplete $out/bin/$cmd -s fish) \
-        --zsh <(register-python-argcomplete $out/bin/$cmd -s zsh)
+        --bash <(register-python-argcomplete $cmd) \
+        --fish <(register-python-argcomplete $cmd -s fish) \
+        --zsh <(register-python-argcomplete $cmd -s zsh)
     done
   '';
 

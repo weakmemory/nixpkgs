@@ -1,15 +1,15 @@
 { lib, stdenv, fetchFromGitHub, cmake }:
 stdenv.mkDerivation rec {
   pname = "vulkan-headers";
-  version = "1.3.261";
+  version = "1.3.280.0";
 
   nativeBuildInputs = [ cmake ];
 
   src = fetchFromGitHub {
     owner = "KhronosGroup";
     repo = "Vulkan-Headers";
-    rev = "v${version}";
-    hash = "sha256-zKHew7SGUq1C3XGp/HrCle6KyqB4cziPcTYVqAr814s=";
+    rev = "vulkan-sdk-${version}";
+    hash = "sha256-EnKiCtH6rh3ACQgokSSfp4FPFluMZW0dheP8IEzZtY4=";
   };
 
   passthru.updateScript = ./update.sh;

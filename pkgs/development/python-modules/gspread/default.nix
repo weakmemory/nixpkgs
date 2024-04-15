@@ -7,12 +7,12 @@
 , pytest-vcr
 , pytestCheckHook
 , pythonOlder
-, requests
+, strenum
 }:
 
 buildPythonPackage rec {
   pname = "gspread";
-  version = "5.11.1";
+  version = "6.1.0";
   format = "pyproject";
 
   disabled = pythonOlder "3.7";
@@ -21,7 +21,7 @@ buildPythonPackage rec {
     owner = "burnash";
     repo = "gspread";
     rev = "refs/tags/v${version}";
-    hash = "sha256-a8A47il9NrMdHkSX4YmQj4VIAYDXK5V+FUdwv+LGIfQ=";
+    hash = "sha256-kuXPX+VY0qz4fldGYPbzZMFx+blzsmueews1W+AjQb0=";
   };
 
   nativeBuildInputs = [
@@ -31,7 +31,7 @@ buildPythonPackage rec {
   propagatedBuildInputs = [
     google-auth
     google-auth-oauthlib
-    requests
+    strenum
   ];
 
   nativeCheckInputs = [

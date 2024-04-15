@@ -1,23 +1,23 @@
 { lib
 , fetchPypi
-, fetchpatch
 , buildPythonPackage
 , pythonOlder
 
 # build time
 , astropy-extension-helpers
-, cython
+, cython_3
 , jinja2
 , oldest-supported-numpy
 , setuptools-scm
 , wheel
 # testing
 , pytestCheckHook
+, stdenv
 , pytest-xdist
 , pytest-astropy
-, python
 
 # runtime
+, astropy-iers-data
 , numpy
 , packaging
 , pyerfa
@@ -26,36 +26,19 @@
 
 buildPythonPackage rec {
   pname = "astropy";
-  version = "5.3.3";
-  format = "pyproject";
+  version = "6.0.1";
+  pyproject = true;
 
   disabled = pythonOlder "3.8"; # according to setup.cfg
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-AzDfn116IlQ2fpuM9EJVuhBwsGEjGIxqcu3BgEk/k7s=";
+    hash = "sha256-ial13jVtBgjnTx9JNEL7Osu7eoW3OeB0RguwNAAUs5w=";
   };
-  patches = [
-    # Fixes running tests in parallel issue
-    # https://github.com/astropy/astropy/issues/15316. Fix from
-    # https://github.com/astropy/astropy/pull/15327
-    (fetchpatch {
-      url = "https://github.com/astropy/astropy/commit/1042c0fb06a992f683bdc1eea2beda0b846ed356.patch";
-      hash = "sha256-bApAcGBRrJ94thhByoYvdqw2e6v77+FmTfgmGcE6MMk=";
-    })
-  ];
-
-  # Relax cython dependency to allow this to build, upstream only doesn't
-  # support cython 3 as of writing. See:
-  # https://github.com/astropy/astropy/issues/15315
-  postPatch = ''
-    substituteInPlace pyproject.toml \
-      --replace 'cython==' 'cython>='
-  '';
 
   nativeBuildInputs = [
     astropy-extension-helpers
-    cython
+    cython_3
     jinja2
     oldest-supported-numpy
     setuptools-scm
@@ -63,6 +46,7 @@ buildPythonPackage rec {
   ];
 
   propagatedBuildInputs = [
+    astropy-iers-data
     numpy
     packaging
     pyerfa
@@ -84,6 +68,24 @@ buildPythonPackage rec {
   '';
   pythonImportsCheck = [
     "astropy"
+  ];
+  disabledTests = [
+    # May fail due to parallelism, see:
+    # https://github.com/astropy/astropy/issues/15441
+    "TestUnifiedOutputRegistry"
+
+    # fail due to pytest>=8
+    # https://github.com/astropy/astropy/issues/15960#issuecomment-1913654471
+    "test_distortion_header"
+
+    # flaky
+    "test_timedelta_conversion"
+    # More flaky tests, see: https://github.com/NixOS/nixpkgs/issues/294392
+    "test_sidereal_lon_independent"
+    "test_timedelta_full_precision_arithmetic"
+    "test_datetime_to_timedelta"
+  ] ++ lib.optionals stdenv.isDarwin [
+    "test_sidereal_lat_independent"
   ];
 
   meta = {

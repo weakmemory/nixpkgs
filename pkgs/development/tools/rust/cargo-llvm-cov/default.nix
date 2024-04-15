@@ -21,11 +21,12 @@
 , fetchFromGitHub
 , rustPlatform
 , rustc
+, git
 }:
 
 let
   pname = "cargo-llvm-cov";
-  version = "0.5.32";
+  version = "0.6.9";
 
   owner = "taiki-e";
   homepage = "https://github.com/${owner}/${pname}";
@@ -36,7 +37,7 @@ let
   cargoLock = fetchurl {
     name = "Cargo.lock";
     url = "https://crates.io/api/v1/crates/${pname}/${version}/download";
-    sha256 = "sha256-8waZZyEvdPBJo722/FOQtarJdWR3FPZv9Cw2Pf/waqs=";
+    sha256 = "sha256-r4C7z2/z4OVEf+IhFe061E7FzSx0VzADmg56Lb+DO/g=";
     downloadToTemp = true;
     postFetch = ''
       tar xzf $downloadedFile ${pname}-${version}/Cargo.lock
@@ -54,7 +55,8 @@ rustPlatform.buildRustPackage {
     inherit owner;
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-aG6XNIgSTdce62gQMG3pNIKtP+jQUmVx+7NdHOkvmlQ=";
+    sha256 = "sha256-mNpZj8c+IHcW0StFzRPt7wcysADh01eLFcIK6fX/2KQ=";
+    leaveDotGit = true;
   };
 
   # Upstream doesn't include the lockfile so we need to add it back
@@ -62,17 +64,29 @@ rustPlatform.buildRustPackage {
     cp ${cargoLock} source/Cargo.lock
   '';
 
-  cargoSha256 = "sha256-jUrjGH1c4i+lOv5wHiNQwZifZh7uTVuu2NCSGtK0ohc=";
+  cargoSha256 = "sha256-pfNb5P3IG1fQdhiQE3FGW8s4Rt2YyLxTejuzs3nqZUU=";
 
   # `cargo-llvm-cov` reads these environment variables to find these binaries,
   # which are needed to run the tests
   LLVM_COV = "${llvm}/bin/llvm-cov";
   LLVM_PROFDATA = "${llvm}/bin/llvm-profdata";
 
+  nativeCheckInputs = [
+    git
+  ];
+
+  preCheck = ''
+    # `cargo-llvm-cov`'s tests rely on `git ls-files` so the staging area needs
+    # to not have everything staged as deleted, which is how `leaveDotGit` in
+    # `fetchFromGitHub` leaves the staging area for reproducibility reasons.
+    git restore --staged .
+  '';
+
   meta = {
     inherit homepage;
     changelog = homepage + "/blob/v${version}/CHANGELOG.md";
     description = "Cargo subcommand to easily use LLVM source-based code coverage";
+    mainProgram = "cargo-llvm-cov";
     longDescription = ''
       In order for this to work, you either need to run `rustup component add llvm-
       tools-preview` or install the `llvm-tools-preview` component using your Nix

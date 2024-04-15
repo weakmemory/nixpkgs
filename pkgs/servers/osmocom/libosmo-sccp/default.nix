@@ -10,13 +10,13 @@
 
 stdenv.mkDerivation rec {
   pname = "libosmo-sccp";
-  version = "1.8.0";
+  version = "1.8.1";
 
   src = fetchFromGitHub {
     owner = "osmocom";
     repo = "libosmo-sccp";
     rev = version;
-    hash = "sha256-icEyI0zgsiBfawcNW8IarVPj0VNxzsev2W+cRGPev7Y=";
+    hash = "sha256-GrC++v7PCAnaEtMFt+el/ct2g+/9Axev04g/jMIGyOQ=";
   };
 
   configureFlags = [ "--with-systemdsystemunitdir=$out" ];
@@ -40,6 +40,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "SCCP + SIGTRAN (SUA/M3UA) libraries as well as OsmoSTP";
+    mainProgram = "osmo-stp";
     homepage = "https://osmocom.org/projects/libosmo-sccp";
     license = licenses.gpl2Plus;
     platforms = platforms.linux;
