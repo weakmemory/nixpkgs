@@ -11,16 +11,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "delta";
-  version = "0.17.0";
+  version = "0.17.0-unstable-2024-08-12";
 
   src = fetchFromGitHub {
     owner = "dandavison";
     repo = pname;
-    rev = version;
-    hash = "sha256-r0ED9o2UP91fe6Bng5ioJra5S1bg+UEXMLeSQPkMswI=";
+    rev = "a01141b72001f4c630d77cf5274267d7638851e4";
+    hash = "sha256-My51pQw5a2Y2VTu39MmnjGfmCavg8pFqOmOntUildS0=";
   };
 
-  cargoHash = "sha256-3CxRNhcjfDK/xUuM3w+GwqE0+X6WT92/LGj/qRp0TwA=";
+  cargoHash = "sha256-Rlc3Bc6Jh89KLLEWBWQB5GjoeIuHnwIVZN/MVFMjY24=";
 
   nativeBuildInputs = [
     installShellFiles
@@ -44,16 +44,21 @@ rustPlatform.buildRustPackage rec {
       etc/completion/completion.{bash,fish,zsh}
   '';
 
+  # test_env_parsing_with_pager_set_to_bat sets environment variables,
+  # which can be flaky with multiple threads:
+  # https://github.com/dandavison/delta/issues/1660
+  dontUseCargoParallelTests = true;
+
   checkFlags = lib.optionals stdenv.isDarwin [
     "--skip=test_diff_same_non_empty_file"
   ];
 
   meta = with lib; {
     homepage = "https://github.com/dandavison/delta";
-    description = "A syntax-highlighting pager for git";
+    description = "Syntax-highlighting pager for git";
     changelog = "https://github.com/dandavison/delta/releases/tag/${version}";
     license = licenses.mit;
-    maintainers = with maintainers; [ marsam zowoq SuperSandro2000 figsoda ];
+    maintainers = with maintainers; [ zowoq SuperSandro2000 figsoda ];
     mainProgram = "delta";
   };
 }

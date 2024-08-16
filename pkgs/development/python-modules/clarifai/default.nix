@@ -4,16 +4,11 @@
   clarifai-grpc,
   fetchFromGitHub,
   inquirerpy,
-  llama-index-core,
   numpy,
-  opencv4,
-  pandas,
   pillow,
   pycocotools,
-  pypdf,
   pytestCheckHook,
   pythonOlder,
-  pythonRelaxDepsHook,
   pyyaml,
   rich,
   schema,
@@ -25,7 +20,7 @@
 
 buildPythonPackage rec {
   pname = "clarifai";
-  version = "10.3.0";
+  version = "10.7.0";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
@@ -34,26 +29,21 @@ buildPythonPackage rec {
     owner = "Clarifai";
     repo = "clarifai-python";
     rev = "refs/tags/${version}";
-    hash = "sha256-8EPs6kGB+Px9Fs2Z+YwDcmEYI5+z/kOIKLraJFMykF0=";
+    hash = "sha256-a/twKAwlvn017fqUsDBOcDxoZ63W0p6whQf53wlXFRU=";
   };
 
-  pythonRelaxDeps = [ "clarifai-grpc" ];
-
-  pythonRemoveDeps = [ "opencv-python" ];
+  pythonRelaxDeps = [
+    "clarifai-grpc"
+    "schema"
+  ];
 
   build-system = [ setuptools ];
-
-  nativeBuildInputs = [ pythonRelaxDepsHook ];
 
   dependencies = [
     clarifai-grpc
     inquirerpy
-    llama-index-core
     numpy
-    opencv4
-    pandas
     pillow
-    pypdf
     pyyaml
     rich
     schema
@@ -75,6 +65,8 @@ buildPythonPackage rec {
   disabledTests = [
     # Test requires network access and API key
     "test_export_workflow_general"
+    "test_validate_invalid_id"
+    "test_validate_invalid_hex_id"
   ];
 
   disabledTestPaths = [

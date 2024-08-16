@@ -18,15 +18,15 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "stgit";
-  version = "2.4.6";
+  version = "2.4.9";
 
   src = fetchFromGitHub {
     owner = "stacked-git";
     repo = "stgit";
     rev = "v${version}";
-    hash = "sha256-ZQU9AkemAMpMb2GhdfHaF6r6r6MbMXnmA0pq6Zq9Sek=";
+    hash = "sha256-b8uzekKnNAJGeDYI2puHUaxY6K0s5tWxAWGpufJi/jk=";
   };
-  cargoHash = "sha256-DHTo0jRZlLmw/B042uqzpMLUhBwm+sbFj9pze5l1Kpk=";
+  cargoHash = "sha256-0bbOAo48xRiCyivO3fuThXAIEFgFbxh6ZtFOPikZi88=";
 
   nativeBuildInputs = [
     pkg-config installShellFiles makeWrapper asciidoc xmlto docbook_xsl
@@ -79,7 +79,7 @@ rustPlatform.buildRustPackage rec {
   '';
 
   meta = with lib; {
-    description = "A patch manager implemented on top of Git";
+    description = "Patch manager implemented on top of Git";
     homepage = "https://stacked-git.github.io/";
     license = licenses.gpl2Only;
     platforms = platforms.unix;

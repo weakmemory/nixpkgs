@@ -220,10 +220,10 @@ rec {
           (if isList example then "${pkgsText}." + concatStringsSep "." example else example);
       });
 
-  /* Alias of mkPackageOption. Previously used to create options with markdown
-     documentation, which is no longer required.
+  /* Deprecated alias of mkPackageOption, to be removed in 25.05.
+     Previously used to create options with markdown documentation, which is no longer required.
   */
-  mkPackageOptionMD = mkPackageOption;
+  mkPackageOptionMD = lib.warn "mkPackageOptionMD is deprecated and will be removed in 25.05; please use mkPackageOption." mkPackageOption;
 
   /* This option accepts anything, but it does not produce any result.
 
@@ -404,7 +404,7 @@ rec {
      Kept here to alert downstream users who may not be aware of the migration's
      completion that it should be removed from modules.
   */
-  mdDoc = lib.warn "lib.mdDoc was removed from nixpkgs. Option descriptions are now in Markdown by default, you can remove any remaining uses of it.";
+  mdDoc = lib.warn "lib.mdDoc will be removed from nixpkgs in 24.11. Option descriptions are now in Markdown by default; you can remove any remaining uses of lib.mdDoc.";
 
   /* For use in the `defaultText` and `example` option attributes. Causes the
      given MD text to be inserted verbatim in the documentation, for when

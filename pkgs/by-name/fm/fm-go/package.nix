@@ -1,26 +1,25 @@
 { lib
 , buildGoModule
 , fetchFromGitHub
-, stdenv
 }:
 
 let
   finalAttrs = {
     pname = "fm";
-    version = "1.0.0";
+    version = "1.1.0";
 
     src = fetchFromGitHub {
       owner = "mistakenelf";
       repo = "fm";
       rev = "v${finalAttrs.version}";
-      hash = "sha256-j92xf75JTLBaVr8GjAwlqgrieZCifVaIBy9ZMoDIaEY=";
+      hash = "sha256-m0hjLXgaScJydwiV00b8W7f1y1Ka7bbYqcMPAOw1j+c=";
     };
 
-    vendorHash = "sha256-iDKDUpxaV/ZGKvTeNu4m5X/tqQA311Nb+2gvrehpdpw=";
+    vendorHash = "sha256-/tUL08Vo3W7PMPAnJA9RPdMl0AwZj8BzclYs2257nqM=";
 
     meta = {
       homepage = "https://github.com/mistakenelf/fm";
-      description = "A terminal based file manager";
+      description = "Terminal based file manager";
       changelog = "https://github.com/mistakenelf/fm/releases/tag/${finalAttrs.src.rev}";
       license = with lib.licenses; [ mit ];
       mainProgram = "fm";

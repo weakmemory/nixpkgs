@@ -1,19 +1,19 @@
-{ lib
-, buildPythonPackage
-, certifi
-, fetchFromGitHub
-, pyarrow
-, pytestCheckHook
-, python-dateutil
-, pythonOlder
-, reactivex
-, setuptools
-, urllib3
+{
+  lib,
+  buildPythonPackage,
+  certifi,
+  fetchFromGitHub,
+  pyarrow,
+  python-dateutil,
+  pythonOlder,
+  reactivex,
+  setuptools,
+  urllib3,
 }:
 
 buildPythonPackage rec {
   pname = "influxdb3-python";
-  version = "0.3.6";
+  version = "0.8.0";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
@@ -22,14 +22,12 @@ buildPythonPackage rec {
     owner = "InfluxCommunity";
     repo = "influxdb3-python";
     rev = "refs/tags/v${version}";
-    hash = "sha256-ZKN3chJvtOenk2jp02rvw+HooJcee0hwxWoLvEYjfcg=";
+    hash = "sha256-Knub5rZ27OXsiJanA+sI85DaUIskiGcuedKk1wF5zss=";
   };
 
-  nativeBuildInputs = [
-    setuptools
-  ];
+  build-system = [ setuptools ];
 
-  propagatedBuildInputs = [
+  dependencies = [
     certifi
     pyarrow
     python-dateutil

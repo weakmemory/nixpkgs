@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, fetchurl
+, fetchFromGitHub
 , buildPackages
 , boost
 , gperftools
@@ -13,7 +13,7 @@
 , openldap
 , openssl
 , libpcap
-, python3
+, python311Packages
 , curl
 , Security
 , CoreFoundation
@@ -25,20 +25,19 @@
 #   The command line administrative tools are part of other packages:
 #   see pkgs.mongodb-tools and pkgs.mongosh.
 
-with lib;
-
 { version, sha256, patches ? []
 , license ? lib.licenses.sspl
+, avxSupport ? stdenv.hostPlatform.avxSupport
 }:
 
 let
-  scons = buildPackages.scons;
+  scons = buildPackages.scons.override{ python3Packages = python311Packages; };
   python = scons.python.withPackages (ps: with ps; [
     pyyaml
     cheetah3
     psutil
     setuptools
-  ] ++ lib.optionals (versionAtLeast version "6.0") [
+  ] ++ lib.optionals (lib.versionAtLeast version "6.0") [
     packaging
     pymongo
   ]);
@@ -56,15 +55,17 @@ let
     #"stemmer"  -- not nice to package yet (no versioning, no makefile, no shared libs).
     #"valgrind" -- mongodb only requires valgrind.h, which is vendored in the source.
     #"wiredtiger"
-  ] ++ optionals stdenv.isLinux [ "tcmalloc" ];
+  ] ++ lib.optionals stdenv.isLinux [ "tcmalloc" ];
   inherit (lib) systems subtractLists;
 
 in stdenv.mkDerivation rec {
   inherit version;
   pname = "mongodb";
 
-  src = fetchurl {
-    url = "https://fastdl.mongodb.org/src/mongodb-src-r${version}.tar.gz";
+  src = fetchFromGitHub {
+    owner = "mongodb";
+    repo = "mongo";
+    rev = "r${version}";
     inherit sha256;
   };
 
@@ -105,13 +106,16 @@ in stdenv.mkDerivation rec {
     #include <string>'
     substituteInPlace src/mongo/db/exec/plan_stats.h --replace '#include <string>' '#include <optional>
     #include <string>'
-  '' + lib.optionalString (stdenv.isDarwin && versionOlder version "6.0") ''
+  '' + lib.optionalString (stdenv.isDarwin && lib.versionOlder version "6.0") ''
     substituteInPlace src/third_party/mozjs-${mozjsVersion}/extract/js/src/jsmath.cpp --replace '${mozjsReplace}' 0
   '' + lib.optionalString stdenv.isi686 ''
 
     # don't fail by default on i686
     substituteInPlace src/mongo/db/storage/storage_options.h \
       --replace 'engine("wiredTiger")' 'engine("mmapv1")'
+  '' + lib.optionalString (!avxSupport) ''
+    substituteInPlace SConstruct \
+      --replace-fail "default=['+sandybridge']," 'default=[],'
   '';
 
   env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.cc.isClang
@@ -127,6 +131,7 @@ in stdenv.mkDerivation rec {
     "--disable-warnings-as-errors"
     "VARIANT_DIR=nixos" # Needed so we don't produce argument lists that are too long for gcc / ld
     "--link-model=static"
+    "MONGO_VERSION=${version}"
   ]
   ++ map (lib: "--use-system-${lib}") system-libraries;
 
@@ -136,9 +141,9 @@ in stdenv.mkDerivation rec {
   preBuild = ''
     sconsFlags+=" CC=$CC"
     sconsFlags+=" CXX=$CXX"
-  '' + optionalString (!stdenv.isDarwin) ''
+  '' + lib.optionalString (!stdenv.isDarwin) ''
     sconsFlags+=" AR=$AR"
-  '' + optionalString stdenv.isAarch64 ''
+  '' + lib.optionalString stdenv.isAarch64 ''
     sconsFlags+=" CCFLAGS='-march=armv8-a+crc'"
   '';
 
@@ -158,7 +163,7 @@ in stdenv.mkDerivation rec {
   '';
 
   installTargets =
-    if (versionAtLeast version "6.0") then "install-devcore"
+    if (lib.versionAtLeast version "6.0") then "install-devcore"
     else "install-core";
 
   prefixKey = "DESTDIR=";
@@ -167,8 +172,8 @@ in stdenv.mkDerivation rec {
 
   hardeningEnable = [ "pie" ];
 
-  meta = {
-    description = "A scalable, high-performance, open source NoSQL database";
+  meta = with lib; {
+    description = "Scalable, high-performance, open source NoSQL database";
     homepage = "http://www.mongodb.org";
     inherit license;
 

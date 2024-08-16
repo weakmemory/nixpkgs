@@ -3,30 +3,33 @@
   aiohttp,
   aioresponses,
   buildPythonPackage,
+  deepdiff,
   fetchFromGitHub,
   poetry-core,
   poetry-dynamic-versioning,
+  pycognito,
   pyjwt,
   pytest-aiohttp,
   pytest-freezegun,
   pytestCheckHook,
   pythonOlder,
-  deepdiff,
 }:
 
 buildPythonPackage rec {
   pname = "pylitterbot";
-  version = "2023.4.11";
+  version = "2023.5.1";
   pyproject = true;
 
-  disabled = pythonOlder "3.9";
+  disabled = pythonOlder "3.10";
 
   src = fetchFromGitHub {
     owner = "natekspencer";
     repo = "pylitterbot";
     rev = "refs/tags/v${version}";
-    hash = "sha256-OTyQgcGGNktCgYJN33SZn7La7ec+gwR/yVDuH7kcEh4=";
+    hash = "sha256-Mpqa7pMxnFdSL1KGTUbgjh1zd8bAcoyzgxRZZ4SGfYc=";
   };
+
+  pythonRelaxDeps = [ "deepdiff" ];
 
   build-system = [
     poetry-core
@@ -36,6 +39,7 @@ buildPythonPackage rec {
   dependencies = [
     aiohttp
     deepdiff
+    pycognito
     pyjwt
   ];
 

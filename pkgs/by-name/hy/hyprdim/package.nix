@@ -8,21 +8,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "hyprdim";
-  version = "2.2.4";
+  version = "2.2.6";
 
   src = fetchFromGitHub {
     owner = "donovanglover";
     repo = "hyprdim";
     rev = version;
-    hash = "sha256-XRaBrn8gnXyMiCf3UQvdZGnZ//YMUivfVg0IoZF5F88=";
+    hash = "sha256-zE1GYgS3fFO6Zz1I5zr+ApEux9ndKOeegj2n/rF/4HY=";
   };
 
-  cargoLock = {
-    lockFile = ./Cargo.lock;
-    outputHashes = {
-      "hyprland-0.3.13" = "sha256-gjShmFcECdX0/t7mL035l9e9OzZuJqX0Ueozv38l03g=";
-    };
-  };
+  cargoHash = "sha256-WchQXRlU/fkjnCOeP9E5JXVdM8UZlG3ixfLGHvmezHg=";
 
   nativeBuildInputs = [ installShellFiles ];
 

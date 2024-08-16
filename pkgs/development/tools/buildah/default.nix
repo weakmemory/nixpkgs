@@ -17,13 +17,13 @@
 
 buildGoModule rec {
   pname = "buildah";
-  version = "1.35.3";
+  version = "1.37.1";
 
   src = fetchFromGitHub {
     owner = "containers";
     repo = "buildah";
     rev = "v${version}";
-    hash = "sha256-FqgYpCvEEqgnhCHdHN1/inxMJoOjoHLc/xMfhXsA1nc=";
+    hash = "sha256-43p2sD6mpcoMukr7mY2GTsti4FVC7Blq0ZozuIJlC30=";
   };
 
   outputs = [ "out" "man" ];
@@ -69,7 +69,7 @@ buildGoModule rec {
   };
 
   meta = with lib; {
-    description = "A tool which facilitates building OCI images";
+    description = "Tool which facilitates building OCI images";
     mainProgram = "buildah";
     homepage = "https://buildah.io/";
     changelog = "https://github.com/containers/buildah/releases/tag/v${version}";

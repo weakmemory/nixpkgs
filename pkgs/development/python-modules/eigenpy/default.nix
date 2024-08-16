@@ -1,6 +1,6 @@
 {
   lib,
-  stdenv,
+  buildPythonPackage,
   fetchFromGitHub,
   cmake,
   doxygen,
@@ -11,19 +11,21 @@
   scipy,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+buildPythonPackage rec {
   pname = "eigenpy";
-  version = "3.5.0";
+  version = "3.7.0";
+  pyproject = false; # Built with cmake
 
   src = fetchFromGitHub {
     owner = "stack-of-tasks";
     repo = "eigenpy";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-/k5eltoeUW05FTjvStAOw+tguWLUaUced8TArrk4UDI=";
+    rev = "v${version}";
+    hash = "sha256-D/k/ka500EZch5Ydym2WYtd5vciGkd9rdBUSjTsZ0w4=";
   };
 
   outputs = [
     "dev"
+    "doc"
     "out"
   ];
 
@@ -62,4 +64,4 @@ stdenv.mkDerivation (finalAttrs: {
     ];
     platforms = platforms.unix;
   };
-})
+}

@@ -1,66 +1,75 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, pythonOlder
-, setuptools
-, click
-, jedi
-, markdown
-, pymdown-extensions
-, pygments
-, tomlkit
-, uvicorn
-, starlette
-, websockets
-, docutils
-, black
-, pytestCheckHook
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  pythonOlder,
+  setuptools,
+  click,
+  docutils,
+  itsdangerous,
+  jedi,
+  markdown,
+  packaging,
+  psutil,
+  pygments,
+  pymdown-extensions,
+  ruff,
+  starlette,
+  tomlkit,
+  uvicorn,
+  websockets,
+  pyyaml,
+  pytestCheckHook,
 }:
 
 buildPythonPackage rec {
   pname = "marimo";
-  version = "0.3.12";
+  version = "0.7.20";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-4OwTY4OFkTQcQqHntjcfwPTx4w+2GPEUBy/XgW/nATU=";
+    hash = "sha256-vkEBHJN7VqJU+diijiTV7JABT5g/5NY2XEXM0turDWU=";
   };
 
-  build-system = [
-    setuptools
-  ];
+  build-system = [ setuptools ];
+
+  # ruff is not packaged as a python module in nixpkgs
+  pythonRemoveDeps = [ "ruff" ];
 
   dependencies = [
     click
+    docutils
+    itsdangerous
     jedi
     markdown
-    pymdown-extensions
+    packaging
+    psutil
     pygments
+    pymdown-extensions
+    ruff
+    starlette
     tomlkit
     uvicorn
-    starlette
     websockets
-    docutils
-    black
+    pyyaml
   ];
 
-  nativeCheckInputs = [
-    pytestCheckHook
-  ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
-  pythonImportsCheck = [
-    "marimo"
-  ];
+  pythonImportsCheck = [ "marimo" ];
 
   meta = with lib; {
-    description = "A reactive Python notebook that's reproducible, git-friendly, and deployable as scripts or apps";
+    description = "Reactive Python notebook that's reproducible, git-friendly, and deployable as scripts or apps";
     homepage = "https://github.com/marimo-team/marimo";
     changelog = "https://github.com/marimo-team/marimo/releases/tag/${version}";
     license = licenses.asl20;
     mainProgram = "marimo";
-    maintainers = with maintainers; [ akshayka dmadisetti ];
+    maintainers = with maintainers; [
+      akshayka
+      dmadisetti
+    ];
   };
 }

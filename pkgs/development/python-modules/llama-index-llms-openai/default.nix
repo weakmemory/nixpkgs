@@ -9,7 +9,7 @@
 
 buildPythonPackage rec {
   pname = "llama-index-llms-openai";
-  version = "0.1.15";
+  version = "0.1.27";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
@@ -17,7 +17,7 @@ buildPythonPackage rec {
   src = fetchPypi {
     pname = "llama_index_llms_openai";
     inherit version;
-    hash = "sha256-a9vzB7HUOpp8KlL3K6fbYcuW2QT5nn6l2IndeBjxCBQ=";
+    hash = "sha256-N8LRFZtWYH06gH2QJg7iW08AIIbWJRxycq+8U/JRRgM=";
   };
 
   build-system = [ poetry-core ];

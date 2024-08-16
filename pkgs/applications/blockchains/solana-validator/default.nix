@@ -2,7 +2,6 @@
 
 { stdenv
 , fetchFromGitHub
-, fetchpatch
 , lib
 , rustPlatform
 , pkg-config
@@ -13,7 +12,7 @@
 , openssl
 , libclang
 , libcxx
-, rocksdb
+, rocksdb_8_3
 , rustfmt
 , perl
 , hidapi
@@ -46,6 +45,7 @@ let
   pinData = lib.importJSON ./pin.json;
   version = pinData.version;
   hash = pinData.hash;
+  rocksdb = rocksdb_8_3;
   inherit (darwin.apple_sdk_11_0) Libsystem;
   inherit (darwin.apple_sdk_11_0.frameworks) System IOKit AppKit Security;
 in
@@ -96,7 +96,7 @@ rustPlatform.buildRustPackage rec {
   };
 
   meta = with lib; {
-    description = "Web-Scale Blockchain for fast, secure, scalable, decentralized apps and marketplaces. ";
+    description = "Web-Scale Blockchain for fast, secure, scalable, decentralized apps and marketplaces.";
     homepage = "https://solana.com";
     license = licenses.asl20;
     maintainers = with maintainers; [ adjacentresearch ];

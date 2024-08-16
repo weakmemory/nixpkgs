@@ -15,14 +15,13 @@
   libxml2,
   libxshmfence,
   man,
-  nix-update-script,
   pcre,
   pkg-config,
   poppler,
   stdenv,
   testers,
   webkitgtk,
-  wrapGAppsHook,
+  wrapGAppsHook3,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -47,7 +46,7 @@ stdenv.mkDerivation (finalAttrs: {
     installShellFiles
     man
     pkg-config
-    wrapGAppsHook
+    wrapGAppsHook3
   ];
 
   buildInputs = [

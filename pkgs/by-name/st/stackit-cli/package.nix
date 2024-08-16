@@ -6,22 +6,21 @@
 , less
 , xdg-utils
 , testers
-, runCommand
 , stackit-cli
 }:
 
 buildGoModule rec {
   pname = "stackit-cli";
-  version = "0.2.1";
+  version = "0.11.0";
 
   src = fetchFromGitHub {
     owner = "stackitcloud";
     repo = "stackit-cli";
     rev = "v${version}";
-    hash = "sha256-eAJe/AlYxp0v2LifXdlSxeZL+qwKf2wj+tnNJ2Y8LcQ=";
+    hash = "sha256-ioV5ki2Jkbo/Ax9XDp/gm9NFTFS9604VAwOgs8wkoKU=";
   };
 
-  vendorHash = "sha256-gir3RtIdQ/xDVL050kH8OxFuHoBOD2weeyRjguhubV0=";
+  vendorHash = "sha256-1MM4P4eLBZvYgmdYjaihe30qnCvTuY7ZHnAZei3dHhQ=";
 
   subPackages = [ "." ];
 
@@ -35,22 +34,13 @@ buildGoModule rec {
 
   nativeBuildInputs = [ installShellFiles makeWrapper ];
 
-  preCheck = ''
-    export HOME=$TMPDIR # needed because the binary always creates a dir & config file
-  '';
-
   postInstall = ''
-    export HOME=$TMPDIR # needed because the binary always creates a dir & config file
     mv $out/bin/{${pname},stackit} # rename the binary
 
-    installShellCompletion --cmd stackit --bash <($out/bin/stackit completion bash)
-    installShellCompletion --cmd stackit --zsh <($out/bin/stackit completion zsh)
-    installShellCompletion --cmd stackit --fish <($out/bin/stackit completion fish)
-    # Use this instead, once https://github.com/stackitcloud/stackit-cli/issues/153 is fixed:
-    # installShellCompletion --cmd stackit \
-    #   --bash <($out/bin/stackit completion bash) \
-    #   --zsh  <($out/bin/stackit completion zsh)  \
-    #   --fish <($out/bin/stackit completion fish)
+    installShellCompletion --cmd stackit \
+      --bash <($out/bin/stackit completion bash) \
+      --zsh  <($out/bin/stackit completion zsh)  \
+      --fish <($out/bin/stackit completion fish)
     # Ensure that all 3 completion scripts exist AND have content (should be kept for regression testing)
     [ $(find $out/share -not -empty -type f | wc -l) -eq 3 ]
   '';
@@ -65,7 +55,7 @@ buildGoModule rec {
   passthru.tests = {
     version = testers.testVersion {
       package = stackit-cli;
-      command = "HOME=$TMPDIR stackit --version";
+      command = "stackit --version";
     };
   };
 

@@ -35,6 +35,7 @@
 , python3Packages
 , nixosTests
 , libiconv
+, testers
 
 , enableLDAP ? false, openldap
 , enablePrinting ? false, cups
@@ -49,24 +50,25 @@
 , enablePam ? (!stdenv.isDarwin), pam
 }:
 
-with lib;
-
 let
   # samba-tool requires libxcrypt-legacy algorithms
   python = python3Packages.python.override {
+    self = python;
     libxcrypt = libxcrypt-legacy;
   };
   wrapPython = python3Packages.wrapPython.override {
     inherit python;
   };
+
+  inherit (lib) optional optionals;
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "samba";
-  version = "4.20.0";
+  version = "4.20.1";
 
   src = fetchurl {
-    url = "mirror://samba/pub/samba/stable/${pname}-${version}.tar.gz";
-    hash = "sha256-AmclQlEKxuXQyRwMFNkKtObsOXxwnpUsbaOm4LTVpC8=";
+    url = "mirror://samba/pub/samba/stable/samba-${finalAttrs.version}.tar.gz";
+    hash = "sha256-+Tw69SlTQNCBBsfA3PuF5PhQV9/RRYeqiBe+sxr/iPc=";
   };
 
   outputs = [ "out" "dev" "man" ];
@@ -172,6 +174,8 @@ stdenv.mkDerivation rec {
     ++ optional (!enablePam) "--without-pam"
     ++ optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
     "--bundled-libraries=!asn1_compile,!compile_et"
+    "--cross-compile"
+    "--cross-execute=${stdenv.hostPlatform.emulator buildPackages}"
   ] ++ optionals stdenv.buildPlatform.is32bit [
     # By default `waf configure` spawns as many as available CPUs. On
     # 32-bit systems with many CPUs (like `i686` chroot on `x86_64`
@@ -196,7 +200,7 @@ stdenv.mkDerivation rec {
 
   # Save asn1_compile and compile_et so they are available to run on the build
   # platform when cross-compiling
-  postInstall = optionalString (stdenv.hostPlatform == stdenv.buildPlatform) ''
+  postInstall = lib.optionalString (stdenv.hostPlatform == stdenv.buildPlatform) ''
     mkdir -p "$dev/bin"
     cp bin/asn1_compile bin/compile_et "$dev/bin"
   '';
@@ -239,16 +243,38 @@ stdenv.mkDerivation rec {
     lib.optionals (buildPackages.python3Packages.python != python3Packages.python)
       [ buildPackages.python3Packages.python ];
 
-  passthru = {
-    tests.samba = nixosTests.samba;
+  passthru.tests = {
+    samba = nixosTests.samba;
+    pkg-config = testers.hasPkgConfigModules {
+      package = finalAttrs.finalPackage;
+    };
+    version = testers.testVersion {
+      command = "${finalAttrs.finalPackage}/bin/smbd -V";
+      package = finalAttrs.finalPackage;
+    };
   };
 
   meta = with lib; {
     homepage = "https://www.samba.org";
-    description = "The standard Windows interoperability suite of programs for Linux and Unix";
+    description = "Standard Windows interoperability suite of programs for Linux and Unix";
     license = licenses.gpl3;
     platforms = platforms.unix;
     broken = enableGlusterFS;
     maintainers = with maintainers; [ aneeshusa ];
+    pkgConfigModules = [
+      "dcerpc_samr"
+      "dcerpc"
+      "ndr_krb5pac"
+      "ndr_nbt"
+      "ndr_standard"
+      "ndr"
+      "netapi"
+      "samba-credentials"
+      "samba-hostconfig"
+      "samba-util"
+      "samdb"
+      "smbclient"
+      "wbclient"
+    ];
   };
-}
+})

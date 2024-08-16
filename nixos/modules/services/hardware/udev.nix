@@ -29,9 +29,6 @@ let
   };
 
   nixosRules = ''
-    # Miscellaneous devices.
-    KERNEL=="kvm",                  MODE="0666"
-
     # Needed for gpm.
     SUBSYSTEM=="input", KERNEL=="mice", TAG+="systemd"
   '';
@@ -93,7 +90,7 @@ let
       echo "OK"
 
       echo -n "Checking that all programs called by absolute paths in udev rules exist... "
-      import_progs=$(grep 'IMPORT{program}="\/' $out/* |
+      import_progs=$(grep 'IMPORT{program}="/' $out/* |
         sed -e 's/.*IMPORT{program}="\([^ "]*\)[ "].*/\1/' | uniq)
       run_progs=$(grep -v '^[[:space:]]*#' $out/* | grep 'RUN+="/' |
         sed -e 's/.*RUN+="\([^ "]*\)[ "].*/\1/' | uniq)
@@ -167,10 +164,16 @@ let
       mv etc/udev/hwdb.bin $out
     '';
 
-  compressFirmware = firmware: if (config.boot.kernelPackages.kernelAtLeast "5.3" && (firmware.compressFirmware or true)) then
-    pkgs.compressFirmwareXz firmware
-  else
-    id firmware;
+  compressFirmware = firmware:
+    let
+      inherit (config.boot.kernelPackages) kernelAtLeast;
+    in
+      if ! (firmware.compressFirmware or true) then
+        firmware
+      else
+        if kernelAtLeast "5.19" then pkgs.compressFirmwareZstd firmware
+        else if kernelAtLeast "5.3" then pkgs.compressFirmwareXz firmware
+        else firmware;
 
   # Udev has a 512-character limit for ENV{PATH}, so create a symlink
   # tree to work around this.
@@ -401,17 +404,19 @@ in
       }))
     ];
 
-    environment.etc =
-      {
-        "udev/rules.d".source = udevRulesFor {
-          name = "udev-rules";
-          udevPackages = cfg.packages;
-          systemd = config.systemd.package;
-          binPackages = cfg.packages;
-          inherit udevPath udev;
-        };
-        "udev/hwdb.bin".source = hwdbBin;
+    environment.etc = {
+      "udev/rules.d".source = udevRulesFor {
+        name = "udev-rules";
+        udevPackages = cfg.packages;
+        systemd = config.systemd.package;
+        binPackages = cfg.packages;
+        inherit udevPath udev;
       };
+      "udev/hwdb.bin".source = hwdbBin;
+    } // lib.optionalAttrs config.boot.modprobeConfig.enable {
+      # We don't place this into `extraModprobeConfig` so that stage-1 ramdisk doesn't bloat.
+      "modprobe.d/firmware.conf".text = "options firmware_class path=${config.hardware.firmware}/lib/firmware";
+    };
 
     system.requiredKernelConfig = with config.lib.kernelConfig; [
       (isEnabled "UNIX")
@@ -419,21 +424,17 @@ in
       (isYes "NET")
     ];
 
-    # We don't place this into `extraModprobeConfig` so that stage-1 ramdisk doesn't bloat.
-    environment.etc."modprobe.d/firmware.conf".text = "options firmware_class path=${config.hardware.firmware}/lib/firmware";
+    system.activationScripts.udevd = lib.mkIf config.boot.kernel.enable ''
+      # The deprecated hotplug uevent helper is not used anymore
+      if [ -e /proc/sys/kernel/hotplug ]; then
+        echo "" > /proc/sys/kernel/hotplug
+      fi
 
-    system.activationScripts.udevd =
-      ''
-        # The deprecated hotplug uevent helper is not used anymore
-        if [ -e /proc/sys/kernel/hotplug ]; then
-          echo "" > /proc/sys/kernel/hotplug
-        fi
-
-        # Allow the kernel to find our firmware.
-        if [ -e /sys/module/firmware_class/parameters/path ]; then
-          echo -n "${config.hardware.firmware}/lib/firmware" > /sys/module/firmware_class/parameters/path
-        fi
-      '';
+      # Allow the kernel to find our firmware.
+      if [ -e /sys/module/firmware_class/parameters/path ]; then
+        echo -n "${config.hardware.firmware}/lib/firmware" > /sys/module/firmware_class/parameters/path
+      fi
+    '';
 
     systemd.services.systemd-udevd =
       { restartTriggers = cfg.packages;

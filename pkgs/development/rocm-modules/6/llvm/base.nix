@@ -72,9 +72,7 @@ in stdenv.mkDerivation (finalAttrs: {
     "info" # Avoid `attribute 'info' missing` when using with wrapCC
   ];
 
-  patches = [
-    ./add-compression-to-clang-offload-bundler.patch
-  ] ++ extraPatches;
+  patches = extraPatches;
 
   src = fetchFromGitHub {
     owner = "ROCm";
@@ -88,7 +86,7 @@ in stdenv.mkDerivation (finalAttrs: {
     cmake
     ninja
     git
-    python3Packages.python
+    (python3Packages.python.withPackages (p: [ p.setuptools ]))
   ] ++ lib.optionals (buildDocs || buildMan) [
     doxygen
     sphinx

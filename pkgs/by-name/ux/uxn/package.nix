@@ -7,13 +7,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "uxn";
-  version = "unstable-2024-04-05";
+  version = "1.0-unstable-2024-08-05";
 
   src = fetchFromSourcehut {
     owner = "~rabbits";
     repo = "uxn";
-    rev = "41567558bc1ec4721fee1cc316c3a3cdc627b102";
-    hash = "sha256-Qvq9/kNZAKRHH3NIxiX5+67ibeX5QzK97EhuoplTBDQ=";
+    rev = "a9d7ff23a533ee354fcbc5a1260296a6b0ecfefa";
+    hash = "sha256-VPIgS127ewX5yTZEZZgUZYAXqbCfSa+AMtFMufdQMWo=";
   };
 
   outputs = [ "out" "projects" ];
@@ -59,7 +59,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     homepage = "https://wiki.xxiivv.com/site/uxn.html";
-    description = "An assembler and emulator for the Uxn stack machine";
+    description = "Assembler and emulator for the Uxn stack machine";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ AndersonTorres ];
     mainProgram = "uxnemu";

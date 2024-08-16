@@ -7,19 +7,20 @@
 
 let
   python = python3.override {
+    self = python;
     packageOverrides = self: super: { sqlalchemy = super.sqlalchemy_1_4; };
   };
 in
 python.pkgs.buildPythonApplication rec {
   pname = "pacu";
-  version = "1.5.2";
+  version = "1.6.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "RhinoSecurityLabs";
     repo = "pacu";
     rev = "refs/tags/v${version}";
-    hash = "sha256-Ty++jNJTk8YKy6Sl6xj1Xs25ZxJCeF9m/iwdA2fRXnI=";
+    hash = "sha256-Td5H4O6/7Gh/rvP191xjCJmIbyc4ezZC5Fh4FZ39ZUM=";
   };
 
   pythonRelaxDeps = [
@@ -32,7 +33,6 @@ python.pkgs.buildPythonApplication rec {
 
   build-system = with python.pkgs; [ poetry-core ];
 
-  nativeBuildInputs = with python.pkgs; [ pythonRelaxDepsHook ];
 
   dependencies =
     [ awscli ]

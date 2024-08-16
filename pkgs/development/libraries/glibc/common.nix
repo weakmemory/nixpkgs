@@ -36,6 +36,8 @@
 , withLinuxHeaders ? false
 , profilingLibraries ? false
 , withGd ? false
+, enableCET ? false
+, enableCETRuntimeDefault ? false
 , extraBuildInputs ? []
 , extraNativeBuildInputs ? []
 , ...
@@ -43,12 +45,13 @@
 
 let
   version = "2.39";
-  patchSuffix = "-5";
+  patchSuffix = "-52";
   sha256 = "sha256-93vUfPgXDFc2Wue/hmlsEYrbOxINMlnGTFAtPcHi2SY=";
 in
 
 assert withLinuxHeaders -> linuxHeaders != null;
 assert withGd -> gd != null && libpng != null;
+assert enableCET == false -> !enableCETRuntimeDefault;
 
 stdenv.mkDerivation ({
   version = version + patchSuffix;
@@ -59,11 +62,15 @@ stdenv.mkDerivation ({
     [
       /* No tarballs for stable upstream branch, only https://sourceware.org/git/glibc.git and using git would complicate bootstrapping.
           $ git fetch --all -p && git checkout origin/release/2.39/master && git describe
-          glibc-2.39-5-ge0910f1d32
-          $ git show --minimal --reverse glibc-2.39.. > 2.39-master.patch
+          glibc-2.39-52-gf8e4623421
+          $ git show --minimal --reverse glibc-2.39.. ':!ADVISORIES' > 2.39-master.patch
 
          To compare the archive contents zdiff can be used.
           $ diff -u 2.39-master.patch ../nixpkgs/pkgs/development/libraries/glibc/2.39-master.patch
+
+         Please note that each commit has changes to the file ADVISORIES excluded since
+         that conflicts with the directory advisories/ making cross-builds from
+         hosts with case-insensitive file-systems impossible.
        */
       ./2.39-master.patch
 
@@ -109,7 +116,8 @@ stdenv.mkDerivation ({
       lib.optional (isAarch64 && isLinux) ./0001-aarch64-math-vector.h-add-NVCC-include-guard.patch
     )
     ++ lib.optional stdenv.hostPlatform.isMusl ./fix-rpc-types-musl-conflicts.patch
-    ++ lib.optional stdenv.buildPlatform.isDarwin ./darwin-cross-build.patch;
+    ++ lib.optional stdenv.buildPlatform.isDarwin ./darwin-cross-build.patch
+    ++ lib.optional enableCETRuntimeDefault ./2.39-revert-cet-default-disable.patch;
 
   postPatch =
     ''
@@ -154,9 +162,9 @@ stdenv.mkDerivation ({
       # and on aarch64 with binutils 2.30 or later.
       # https://sourceware.org/glibc/wiki/PortStatus
       "--enable-static-pie"
-    ] ++ lib.optionals stdenv.hostPlatform.isx86_64 [
+    ] ++ lib.optionals (enableCET != false) [
       # Enable Intel Control-flow Enforcement Technology (CET) support
-      "--enable-cet"
+      "--enable-cet${if builtins.isString enableCET then "=${enableCET}"  else ""}"
     ] ++ lib.optionals withLinuxHeaders [
       "--enable-kernel=3.10.0" # RHEL 7 and derivatives, seems oldest still supported kernel
     ] ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
@@ -208,7 +216,7 @@ stdenv.mkDerivation ({
   passthru = { inherit version; minorRelease = version; };
 }
 
-// (removeAttrs args [ "withLinuxHeaders" "withGd" "postInstall" "makeFlags" ]) //
+// (removeAttrs args [ "withLinuxHeaders" "withGd" "enableCET" "postInstall" "makeFlags" ]) //
 
 {
   src = fetchurl {
@@ -273,7 +281,7 @@ stdenv.mkDerivation ({
 
   meta = with lib; {
     homepage = "https://www.gnu.org/software/libc/";
-    description = "The GNU C Library";
+    description = "GNU C Library";
 
     longDescription =
       '' Any Unix-like operating system needs a C library: the library which

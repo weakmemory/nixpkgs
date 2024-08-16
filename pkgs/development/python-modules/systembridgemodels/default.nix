@@ -1,15 +1,16 @@
-{ lib
-, buildPythonPackage
-, pythonOlder
-, fetchFromGitHub
-, setuptools
-, incremental
-, pytestCheckHook
+{
+  lib,
+  buildPythonPackage,
+  pythonOlder,
+  fetchFromGitHub,
+  setuptools,
+  incremental,
+  pytestCheckHook,
 }:
 
 buildPythonPackage rec {
   pname = "systembridgemodels";
-  version = "4.0.4";
+  version = "4.1.0";
   pyproject = true;
 
   disabled = pythonOlder "3.11";
@@ -18,27 +19,21 @@ buildPythonPackage rec {
     owner = "timmo001";
     repo = "system-bridge-models";
     rev = "refs/tags/${version}";
-    hash = "sha256-iFJ95ouhfbaC0D2Gkc1KO+JueYTFTOj1unnYSDyPAe8=";
+    hash = "sha256-wyTlkbrf9H1mdVyZP234nVDuls/QrFXcv3pXhztp9+A=";
   };
 
   postPatch = ''
     substituteInPlace systembridgemodels/_version.py \
-      --replace-fail ", dev=1" ""
+      --replace-fail ", dev=0" ""
   '';
 
-  nativeBuildInputs = [
-    setuptools
-  ];
+  build-system = [ setuptools ];
 
-  propagatedBuildInputs = [
-    incremental
-  ];
+  dependencies = [ incremental ];
 
   pythonImportsCheck = [ "systembridgemodels" ];
 
-  nativeCheckInputs = [
-    pytestCheckHook
-  ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   meta = {
     changelog = "https://github.com/timmo001/system-bridge-models/releases/tag/${version}";

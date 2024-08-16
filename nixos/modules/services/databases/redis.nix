@@ -57,21 +57,14 @@ in {
       package = mkPackageOption pkgs "redis" { };
 
       vmOverCommit = mkEnableOption ''
-        setting of vm.overcommit_memory to 1
+        set `vm.overcommit_memory` sysctl to 1
         (Suggested for Background Saving: <https://redis.io/docs/get-started/faq/>)
-      '';
+      '' // { default = true; };
 
       servers = mkOption {
         type = with types; attrsOf (submodule ({ config, name, ... }: {
           options = {
-            enable = mkEnableOption ''
-              Redis server.
-
-              Note that the NixOS module for Redis disables kernel support
-              for Transparent Huge Pages (THP),
-              because this features causes major performance problems for Redis,
-              e.g. (https://redis.io/topics/latency)
-            '';
+            enable = mkEnableOption "Redis server";
 
             user = mkOption {
               type = types.str;
@@ -312,10 +305,9 @@ in {
       '';
     }) enabledServers);
 
-    boot.kernel.sysctl = mkMerge [
-      { "vm.nr_hugepages" = "0"; }
-      ( mkIf cfg.vmOverCommit { "vm.overcommit_memory" = "1"; } )
-    ];
+    boot.kernel.sysctl = mkIf cfg.vmOverCommit {
+      "vm.overcommit_memory" = "1";
+    };
 
     networking.firewall.allowedTCPPorts = concatMap (conf:
       optional conf.openFirewall conf.port

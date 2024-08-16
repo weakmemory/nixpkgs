@@ -15,13 +15,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "nco";
-  version = "5.2.3";
+  version = "5.2.7";
 
   src = fetchFromGitHub {
     owner = "nco";
     repo = "nco";
     rev = finalAttrs.version;
-    hash = "sha256-a1Q1oK546F1itCtugpbh9fc+asokuXGMS51OgZ59bnY=";
+    hash = "sha256-RtjLCs+1HI2tJsSzMwoKq09teILvxFapZCxeZAZ4iCM=";
   };
 
   nativeBuildInputs = [

@@ -3,7 +3,7 @@
   automake, autoconf, libiconv, libtool, intltool, gettext, python3, perl,
   freetype, tradcpp, fontconfig, meson, ninja, ed, fontforge,
   libGL, spice-protocol, zlib, libGLU, dbus, libunwind, libdrm, netbsd,
-  ncompress,
+  ncompress, updateAutotoolsGnuConfigScriptsHook,
   mesa, udev, bootstrap_cmds, bison, flex, clangStdenv, autoreconfHook,
   mcpp, libepoxy, openssl, pkg-config, llvm, libxslt, libxcrypt, hwdata,
   ApplicationServices, Carbon, Cocoa, Xplugin,
@@ -45,7 +45,10 @@ self: super:
       postInstallHooks+=(wrapWithXFileSearchPath)
   '')) {};
 
-  appres = addMainProgram super.appres { };
+  appres = super.appres.overrideAttrs (attrs: {
+    nativeBuildInputs = attrs.nativeBuildInputs ++ [ meson ninja ];
+    meta = attrs.meta // { mainProgram = "appres"; };
+  });
 
   bdftopcf = super.bdftopcf.overrideAttrs (attrs: {
     buildInputs = attrs.buildInputs ++ [ xorg.xorgproto ];
@@ -147,7 +150,8 @@ self: super:
   libX11 = super.libX11.overrideAttrs (attrs: {
     outputs = [ "out" "dev" "man" ];
     configureFlags = attrs.configureFlags or []
-      ++ malloc0ReturnsNullCrossFlag;
+      ++ malloc0ReturnsNullCrossFlag
+      ++ lib.optional (stdenv.targetPlatform.useLLVM or false) "ac_cv_path_RAWCPP=cpp";
     depsBuildBuild = [
       buildPackages.stdenv.cc
     ] ++ lib.optionals stdenv.hostPlatform.isStatic [
@@ -255,7 +259,8 @@ self: super:
       sed 's,^as_dummy.*,as_dummy="\$PATH",' -i configure
     '';
     configureFlags = attrs.configureFlags or []
-      ++ malloc0ReturnsNullCrossFlag;
+      ++ malloc0ReturnsNullCrossFlag
+      ++ lib.optional (stdenv.targetPlatform.useLLVM or false) "ac_cv_path_RAWCPP=cpp";
     propagatedBuildInputs = attrs.propagatedBuildInputs or [] ++ [ xorg.libSM ];
     depsBuildBuild = [ buildPackages.stdenv.cc ];
     CPP = if stdenv.isDarwin then "clang -E -" else "${stdenv.cc.targetPrefix}cc -E -";
@@ -397,6 +402,7 @@ self: super:
 
   libXpresent = super.libXpresent.overrideAttrs (attrs: {
     buildInputs = with xorg; attrs.buildInputs ++ [ libXext libXfixes libXrandr ];
+    propagatedBuildInputs = attrs.propagatedBuildInputs or [] ++ [ xorg.libXfixes ];
   });
 
   libxkbfile = super.libxkbfile.overrideAttrs (attrs: {
@@ -422,6 +428,10 @@ self: super:
       # https://gitlab.freedesktop.org/xorg/lib/libpciaccess/-/blob/master/configure.ac#L108-114
       platforms = lib.fold (os: ps: ps ++ lib.platforms.${os}) []
         [ "cygwin" "freebsd" "linux" "netbsd" "openbsd" "illumos" ];
+      badPlatforms = [
+        # mandatory shared library
+        lib.systems.inspect.platformPatterns.isStatic
+      ];
     };
   });
 
@@ -557,7 +567,6 @@ self: super:
   xf86videoi128    = super.xf86videoi128.overrideAttrs    (attrs: { meta = attrs.meta // { broken = true; }; });
   xf86videonewport = super.xf86videonewport.overrideAttrs (attrs: { meta = attrs.meta // { broken = true; }; });
   xf86videos3virge = super.xf86videos3virge.overrideAttrs (attrs: { meta = attrs.meta // { broken = true; }; });
-  xf86videosavage  = super.xf86videosavage.overrideAttrs  (attrs: { meta = attrs.meta // { broken = true; }; });
   xf86videotga     = super.xf86videotga.overrideAttrs     (attrs: { meta = attrs.meta // { broken = true; }; });
   xf86videov4l     = super.xf86videov4l.overrideAttrs     (attrs: { meta = attrs.meta // { broken = true; }; });
   xf86videovoodoo  = super.xf86videovoodoo.overrideAttrs  (attrs: { meta = attrs.meta // { broken = true; }; });
@@ -633,7 +642,7 @@ self: super:
 
   xkeyboardconfig = super.xkeyboardconfig.overrideAttrs (attrs: {
     prePatch = ''
-      patchShebangs rules/merge.py rules/compat/map-variants.py rules/xml2lst.pl
+      patchShebangs rules/merge.py rules/compat/map-variants.py rules/generate-options-symbols.py rules/xml2lst.pl
     '';
     nativeBuildInputs = attrs.nativeBuildInputs ++ [
       meson
@@ -832,6 +841,7 @@ self: super:
         buildInputs = commonBuildInputs ++ [
           bootstrap_cmds automake autoconf
           Xplugin Carbon Cocoa
+          mesa
         ];
         propagatedBuildInputs = commonPropagatedBuildInputs ++ [
           libAppleWM xorgproto
@@ -901,8 +911,38 @@ self: super:
         };
       }));
 
+  # xvfb is used by a bunch of things to run tests
+  # and doesn't support hardware accelerated rendering
+  # so remove it from the rebuild heavy path for mesa
+  xvfb = super.xorgserver.overrideAttrs(old: {
+    configureFlags = [
+      "--enable-xvfb"
+      "--disable-xorg"
+      "--disable-xquartz"
+      "--disable-xwayland"
+      "--disable-glamor"
+      "--disable-glx"
+      "--disable-dri"
+      "--disable-dri2"
+      "--disable-dri3"
+      "--with-xkb-bin-directory=${xorg.xkbcomp}/bin"
+      "--with-xkb-path=${xorg.xkeyboardconfig}/share/X11/xkb"
+      "--with-xkb-output=$out/share/X11/xkb/compiled"
+    ] ++ lib.optional stdenv.isDarwin [
+      "--without-dtrace"
+    ];
+
+    buildInputs = old.buildInputs ++ (with xorg; [
+      pixman
+      libXfont2
+      xtrans
+      libxcvt
+    ]) ++ lib.optional stdenv.isDarwin [ Xplugin ];
+  });
+
   lndir = super.lndir.overrideAttrs (attrs: {
     buildInputs = [];
+    nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ];
     preConfigure = ''
       export XPROTO_CFLAGS=" "
       export XPROTO_LIBS=" "

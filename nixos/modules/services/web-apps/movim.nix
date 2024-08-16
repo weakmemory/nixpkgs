@@ -86,8 +86,8 @@ let
                   # `cfg.podConfig` to prevent confusing situtions where the
                   # values are rewritten on server reboot
                   ''
-                    substituteInPlace ${appDir}/app/widgets/AdminMain/adminmain.tpl \
-                      --replace-warn 'name="${k}"' 'name="${k}" disabled'
+                    substituteInPlace ${appDir}/app/Widgets/AdminMain/adminmain.tpl \
+                      --replace-warn 'name="${k}"' 'name="${k}" readonly'
                   '')
               [ ]
               cfg.podConfig));
@@ -103,22 +103,20 @@ let
           lib.concatStringsSep "\n" [
             (lib.optionalString brotli.enable ''
               echo -n "Precompressing static files with Brotli …"
-              find ${appDir}/public -type f ${findTextFileNames} \
-                | ${lib.getExe pkgs.parallel} ${lib.escapeShellArgs [
-                    "--will-cite"
-                    "-j $NIX_BUILD_CORES"
-                    "${lib.getExe brotli.package} --keep --quality=${builtins.toString brotli.compressionLevel} --output={}.br {}"
-                   ]}
+              find ${appDir}/public -type f ${findTextFileNames} -print0 \
+                | xargs -0 -n 1 -P $NIX_BUILD_CORES ${pkgs.writeShellScript "movim_precompress_broti" ''
+                    file="$1"
+                    ${lib.getExe brotli.package} --keep --quality=${builtins.toString brotli.compressionLevel} --output=$file.br $file
+                  ''}
               echo " done."
             '')
             (lib.optionalString gzip.enable ''
               echo -n "Precompressing static files with Gzip …"
-              find ${appDir}/public -type f ${findTextFileNames} \
-                | ${lib.getExe pkgs.parallel} ${lib.escapeShellArgs [
-                    "--will-cite"
-                    "-j $NIX_BUILD_CORES"
-                    "${lib.getExe gzip.package} -c -${builtins.toString gzip.compressionLevel} {} > {}.gz"
-                   ]}
+              find ${appDir}/public -type f ${findTextFileNames} -print0 \
+                | xargs -0 -n 1 -P $NIX_BUILD_CORES ${pkgs.writeShellScript "movim_precompress_broti" ''
+                    file="$1"
+                    ${lib.getExe gzip.package} -c -${builtins.toString gzip.compressionLevel} $file > $file.gz
+                  ''}
               echo " done."
             '')
           ];

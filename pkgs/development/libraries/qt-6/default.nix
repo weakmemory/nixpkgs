@@ -4,7 +4,6 @@
 , generateSplicesForMkScope
 , makeScopeWithSplicing'
 , fetchurl
-, fetchpatch
 , fetchpatch2
 , makeSetupHook
 , makeWrapper
@@ -15,10 +14,6 @@
 , buildPackages
 , python3
 , config
-
-  # options
-, developerBuild ? false
-, debug ? false
 }:
 
 let
@@ -47,7 +42,6 @@ let
       qtbase = callPackage ./modules/qtbase.nix {
         withGtk3 = !stdenv.hostPlatform.isMinGW;
         inherit (srcs.qtbase) src version;
-        inherit developerBuild;
         inherit (darwin.apple_sdk_11_0.frameworks)
           AGL AVFoundation AppKit Contacts CoreBluetooth EventKit GSS MetalKit;
         patches = [
@@ -158,7 +152,7 @@ let
       qtwayland = callPackage ./modules/qtwayland.nix { };
       qtwebchannel = callPackage ./modules/qtwebchannel.nix { };
       qtwebengine = callPackage ./modules/qtwebengine.nix {
-        inherit (darwin) autoSignDarwinBinariesHook bootstrap_cmds cctools xnu;
+        inherit (darwin) autoSignDarwinBinariesHook bootstrap_cmds xnu;
         inherit (darwin.apple_sdk_11_0) libpm libunwind;
         inherit (darwin.apple_sdk_11_0.libs) sandbox;
         inherit (darwin.apple_sdk_11_0.frameworks)
@@ -197,16 +191,13 @@ let
             name = "qmake6-hook";
             propagatedBuildInputs = [ qtbase.dev ];
             substitutions = {
-              inherit debug;
               fix_qmake_libtool = ./hooks/fix-qmake-libtool.sh;
             };
           } ./hooks/qmake-hook.sh)
         { };
     } // lib.optionalAttrs config.allowAliases {
-      # Convert to a throw on 03-01-2023 and backport the change.
-      # Warnings show up in various cli tool outputs, throws do not.
-      # Remove completely before 24.05
-      overrideScope' = lib.warnIf (lib.isInOldestRelease 2311) "qt6 now uses makeScopeWithSplicing which does not have \"overrideScope'\", use \"overrideScope\"." self.overrideScope;
+      # Remove completely before 24.11
+      overrideScope' = builtins.throw "qt6 now uses makeScopeWithSplicing which does not have \"overrideScope'\", use \"overrideScope\".";
     };
 
   baseScope = makeScopeWithSplicing' {

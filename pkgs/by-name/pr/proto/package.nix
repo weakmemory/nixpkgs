@@ -10,16 +10,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "proto";
-  version = "0.32.2";
+  version = "0.38.3";
 
   src = fetchFromGitHub {
     owner = "moonrepo";
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-QxaVXggVfr3O26RwSuUx4qpabhWE9+ZFLKRin/ya2e4=";
+    hash = "sha256-o/du9XmiS7U5ypm6osQtVTjrJY60iLCkJ4DWCYOeIoY=";
   };
 
-  cargoHash = "sha256-j5wXmlauhrUnUVTj/KyqDrf1y9bq3ZInREZXIUQImVE=";
+  cargoHash = "sha256-Z0XPouvv6eR9eKLQurI/UGSiRZyGUo/x1c/XbcJlO5A=";
 
   buildInputs = lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.frameworks.SystemConfiguration
@@ -38,7 +38,7 @@ rustPlatform.buildRustPackage rec {
   '';
 
   meta = {
-    description = "A pluggable multi-language version manager";
+    description = "Pluggable multi-language version manager";
     longDescription = ''
       proto is a pluggable next-generation version manager for multiple programming languages. A unified toolchain.
     '';

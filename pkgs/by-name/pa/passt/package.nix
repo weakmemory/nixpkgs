@@ -7,11 +7,11 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "passt";
-  version = "2024_04_05.954589b";
+  version = "2024_07_26.57a21d2";
 
   src = fetchurl {
     url = "https://passt.top/passt/snapshot/passt-${finalAttrs.version}.tar.gz";
-    hash = "sha256-lwiHjr7rv1xBwXktKAsYIjDzNDkHGjZsW/FsQyFbLng=";
+    hash = "sha256-UK3Klpo3cp4EH42W16qh5WbZlCxb+ETQtWbpgatL/Dc=";
   };
 
   makeFlags = [
